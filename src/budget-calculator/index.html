@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>50/30/20 Budget Calculator · PennyWise</title>
+  <meta name="description" content="Split your take-home pay using the 50/30/20 rule. Calculate your Needs, Wants, and Savings budgets instantly. Free PennyWise calculator with UK-specific guidance.">
+
+  <style>
+    /* ── Reset & Tokens ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:        #FFFBF2;
+      --cream-warm:   #FDF6E8;
+      --sand:         #F0E4CE;
+      --amber:        #D4940B;
+      --amber-dark:   #A6710A;
+      --ink:          #2C2416;
+      --ink-soft:     #5A4E3C;
+      --ink-muted:    #8B7E6B;
+      --white:        #FFFFFF;
+      --green:        #2E7D32;
+      --green-light:  #E8F5E9;
+      --red:          #C62828;
+      --red-light:    #FFEBEE;
+      --border:       #E0D5C1;
+      --border-light: #EDE4D3;
+      --shadow-sm:    0 1px 3px rgba(44, 36, 22, 0.06);
+      --shadow-md:    0 4px 16px rgba(44, 36, 22, 0.08);
+      --shadow-lg:    0 8px 32px rgba(44, 36, 22, 0.10);
+      --radius-sm:    8px;
+      --radius-md:    12px;
+      --radius-lg:    16px;
+      --font-serif:   'Georgia', 'Times New Roman', serif;
+      --font-sans:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono:    'SF Mono', 'Fira Code', 'Consolas', monospace;
+      --max-width:    720px;
+
+      /* Budget category colours */
+      --needs:        #2E7D32;
+      --needs-light:  #E8F5E9;
+      --wants:        #D4940B;
+      --wants-light:  #FFF8E1;
+      --savings:      #1565C0;
+      --savings-light:#E3F2FD;
+    }
+
+    html { font-size: 17px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.65;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Typography ── */
+    h1, h2, h3 { font-family: var(--font-serif); color: var(--ink); line-height: 1.25; }
+    h1 { font-size: 2.2rem; font-weight: 700; }
+    h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+    h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+    p { margin-bottom: 0.85rem; color: var(--ink-soft); }
+    a { color: var(--amber-dark); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; color: var(--amber); }
+
+    .text-muted { color: var(--ink-muted); font-size: 0.9rem; }
+    .text-sm { font-size: 0.85rem; }
+    .text-lg { font-size: 1.1rem; }
+
+    /* ── Layout ── */
+    .container {
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border-light);
+      padding: 0.85rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .nav-logo .coin {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--amber), #C78A0C);
+      color: var(--white);
+      border-radius: 50%;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+    .nav-link {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s;
+    }
+    .nav-link:hover { background: var(--cream-warm); text-decoration: none; color: var(--amber-dark); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 2.5rem 0 2rem;
+      text-align: center;
+      background: linear-gradient(180deg, var(--white) 0%, var(--cream) 100%);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .hero h1 { margin-bottom: 0.5rem; }
+    .hero .subtitle { color: var(--ink-soft); font-size: 1.05rem; max-width: 500px; margin: 0 auto; }
+
+    /* ── Sections ── */
+    section { padding: 2rem 0; }
+    section + section { border-top: 1px solid var(--border-light); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Form ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+    }
+    @media (min-width: 500px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-wrapper:focus-within {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px rgba(212, 148, 11, 0.12);
+    }
+    .input-prefix, .input-suffix {
+      padding: 0 0.65rem;
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      font-weight: 500;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .input-wrapper input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 0.7rem 0.5rem;
+      font-size: 1rem;
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background: transparent;
+      min-width: 0;
+    }
+    .input-wrapper input::placeholder { color: var(--ink-muted); opacity: 0.6; }
+
+    .optional-tag {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-left: 0.25rem;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--amber), #C78A0C);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(212, 148, 11, 0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #C78A0C, var(--amber-dark));
+      box-shadow: 0 4px 14px rgba(212, 148, 11, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn-cta {
+      background: var(--green);
+      color: var(--white);
+      width: 100%;
+      font-size: 1.05rem;
+      padding: 0.9rem 1.75rem;
+      box-shadow: 0 2px 8px rgba(46, 125, 50, 0.25);
+    }
+    .btn-cta:hover {
+      background: #256B28;
+      box-shadow: 0 4px 14px rgba(46, 125, 50, 0.35);
+      transform: translateY(-1px);
+    }
+    .btn-block { width: 100%; }
+
+    /* ── Results ── */
+    .results { display: none; }
+    .results.active { display: block; }
+
+    .result-hero {
+      text-align: center;
+      padding: 1.5rem 0;
+      background: var(--cream-warm);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--sand);
+    }
+    .result-hero .label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      margin-bottom: 0.15rem;
+    }
+    .result-hero .value {
+      font-family: var(--font-serif);
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--amber-dark);
+      line-height: 1.1;
+    }
+    .result-hero .per-month {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      margin-top: 0.1rem;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .result-item {
+      background: var(--cream-warm);
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 1rem;
+      text-align: center;
+      border: 1px solid var(--border-light);
+    }
+    .result-item .r-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-muted);
+    }
+    .result-item .r-value {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 0.15rem;
+    }
+
+    /* ── Split Bar ── */
+    .split-bar {
+      display: flex;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .split-bar .split-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--white);
+      transition: all 0.3s ease;
+    }
+    .split-segment.needs { background: var(--needs); }
+    .split-segment.wants { background: var(--wants); }
+    .split-segment.savings { background: var(--savings); }
+
+    .split-legend {
+      display: flex;
+      gap: 1.25rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .split-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+    }
+    .split-legend-dot {
+      width: 12px; height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .split-legend-dot.needs { background: var(--needs); }
+    .split-legend-dot.wants { background: var(--wants); }
+    .split-legend-dot.savings { background: var(--savings); }
+
+    /* ── Budget Cards ── */
+    .budget-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    @media (min-width: 500px) {
+      .budget-cards { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    .budget-card {
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+    .budget-card.needs-card {
+      background: var(--needs-light);
+      border-color: #C8E6C9;
+    }
+    .budget-card.wants-card {
+      background: var(--wants-light);
+      border-color: #FFE082;
+    }
+    .budget-card.savings-card {
+      background: var(--savings-light);
+      border-color: #BBDEFB;
+    }
+
+    .budget-card .card-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.4rem;
+    }
+    .budget-card .card-title {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+    .budget-card.needs-card .card-title { color: var(--needs); }
+    .budget-card.wants-card .card-title { color: var(--amber-dark); }
+    .budget-card.savings-card .card-title { color: var(--savings); }
+
+    .budget-card .card-percent {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .budget-card .card-amount {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .budget-card .card-annual {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      margin-top: 0.3rem;
+    }
+
+    .budget-card .guidance-list {
+      list-style: none;
+      text-align: left;
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+    .budget-card .guidance-list li {
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+      padding: 0.25rem 0;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .budget-card .guidance-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      font-weight: 700;
+    }
+    .budget-card.needs-card .guidance-list li::before { color: var(--needs); }
+    .budget-card.wants-card .guidance-list li::before { color: var(--amber); }
+    .budget-card.savings-card .guidance-list li::before { color: var(--savings); }
+
+    /* ── Split Summary Tabs ── */
+    .split-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 480px) {
+      .split-summary { grid-template-columns: 1fr; }
+    }
+
+    .split-summary-item {
+      text-align: center;
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+    }
+    .split-summary-item .ss-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+    }
+    .split-summary-item .ss-value {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-top: 0.1rem;
+    }
+    .split-summary-item.needs-bg { background: var(--needs-light); }
+    .split-summary-item.wants-bg { background: var(--wants-light); }
+    .split-summary-item.savings-bg { background: var(--savings-light); }
+    .split-summary-item.needs-bg .ss-value { color: var(--needs); }
+    .split-summary-item.wants-bg .ss-value { color: var(--amber-dark); }
+    .split-summary-item.savings-bg .ss-value { color: var(--savings); }
+
+    /* ── CTA Card ── */
+    .cta-card {
+      background: linear-gradient(135deg, #1B3A1B, #2E5A2E);
+      color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      text-align: center;
+    }
+    .cta-card h3 {
+      color: var(--white);
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+    .cta-card p { color: rgba(255,255,255,0.8); margin-bottom: 1rem; }
+    .cta-card .price { font-size: 1.1rem; font-weight: 700; color: #A5D6A7; }
+
+    /* ── Explainer ── */
+    .explainer p { font-size: 0.95rem; }
+    .explainer ul {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+    .explainer ul li {
+      position: relative;
+      padding-left: 1.4rem;
+      margin-bottom: 0.5rem;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+    }
+    .explainer ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--amber);
+      font-weight: 700;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: auto;
+      background: var(--white);
+      border-top: 1px solid var(--border-light);
+      padding: 1.5rem 0;
+      text-align: center;
+    }
+    .footer p { font-size: 0.85rem; color: var(--ink-muted); margin: 0; }
+    .footer a { font-weight: 500; }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+      background: var(--cream-warm);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      margin-top: 1rem;
+    }
+
+    /* ── Custom Split Toggle ── */
+    .custom-split-fields {
+      display: none;
+      margin-top: 1rem;
+    }
+    .custom-split-fields.active { display: block; }
+
+    .toggle-custom {
+      font-size: 0.85rem;
+      color: var(--amber-dark);
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.5rem;
+      background: none;
+      border: none;
+      font-family: var(--font-sans);
+      padding: 0;
+    }
+    .toggle-custom:hover { color: var(--amber); text-decoration: underline; }
+
+    .preset-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+    .preset-btn {
+      padding: 0.35rem 0.75rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--ink-soft);
+      font-family: var(--font-sans);
+      transition: all 0.15s;
+    }
+    .preset-btn:hover {
+      border-color: var(--amber);
+      color: var(--amber-dark);
+      background: var(--wants-light);
+    }
+    .preset-btn.active {
+      border-color: var(--amber);
+      background: var(--amber);
+      color: var(--white);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      html { font-size: 15px; }
+      h1 { font-size: 1.7rem; }
+      .result-hero .value { font-size: 2.2rem; }
+      .result-grid { grid-template-columns: 1fr; }
+      .budget-cards { grid-template-columns: 1fr; }
+      .split-legend { flex-wrap: wrap; gap: 0.75rem; }
+      .card-amount { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ── -->
+  <nav class="nav">
+    <div class="container">
+      <a href="/" class="nav-logo" aria-label="PennyWise Home">
+        <span class="coin">P</span> PennyWise
+      </a>
+      <a href="/" class="nav-link">All Tools</a>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <header class="hero">
+    <div class="container">
+      <h1>50/30/20 Budget Calculator</h1>
+      <p class="subtitle">Split your take-home pay into Needs, Wants, and Savings. The simple rule that works.</p>
+    </div>
+  </header>
+
+  <!-- ── Calculator Section ── -->
+  <section id="calculator">
+    <div class="container">
+      <div class="card">
+        <h2>Enter Your Take-Home Pay</h2>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="monthlyTakeHome">Monthly Take-Home Pay</label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="monthlyTakeHome" placeholder="2,500" value="2500" min="1" step="50">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Quick Preset Splits</label>
+            <div class="preset-buttons" id="presetButtons">
+              <button class="preset-btn active" data-split="50-30-20">50/30/20</button>
+              <button class="preset-btn" data-split="60-20-20">60/20/20</button>
+              <button class="preset-btn" data-split="40-30-30">40/30/30</button>
+              <button class="preset-btn" data-split="70-20-10">70/20/10</button>
+            </div>
+            <button class="toggle-custom" id="toggleCustom" type="button">
+              <span id="toggleIcon">+</span> Use a custom split
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom Split Fields -->
+        <div class="custom-split-fields" id="customSplitFields">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="needsPct">Needs %</label>
+              <div class="input-wrapper">
+                <input type="number" id="needsPct" placeholder="50" value="50" min="0" max="100" step="1">
+                <span class="input-suffix">%</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="wantsPct">Wants %</label>
+              <div class="input-wrapper">
+                <input type="number" id="wantsPct" placeholder="30" value="30" min="0" max="100" step="1">
+                <span class="input-suffix">%</span>
+              </div>
+            </div>
+            <div class="form-group full">
+              <label for="savingsPct">Savings % <span class="optional-tag">(auto-calculated)</span></label>
+              <div class="input-wrapper">
+                <input type="number" id="savingsPct" placeholder="20" value="20" min="0" max="100" step="1" readonly style="background:var(--cream-warm);cursor:not-allowed;">
+                <span class="input-suffix">%</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-sm text-muted" id="splitWarning" style="margin-top:0.5rem;display:none;color:var(--red);"></p>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="calculateBtn" style="margin-top:1.25rem;">
+          Calculate My Budget
+        </button>
+      </div>
+
+      <!-- ── Results ── -->
+      <div class="results" id="results">
+        <div class="result-hero">
+          <div class="label">Monthly Take-Home Pay</div>
+          <div class="value" id="monthlyTakeHomeDisplay">—</div>
+          <div class="per-month" id="annualTakeHomeDisplay">—</div>
+        </div>
+
+        <!-- Split Visual Bar -->
+        <div class="split-bar" id="splitBar">
+          <div class="split-segment needs" id="needsBar" style="width:50%;">Needs</div>
+          <div class="split-segment wants" id="wantsBar" style="width:30%;">Wants</div>
+          <div class="split-segment savings" id="savingsBar" style="width:20%;">Savings</div>
+        </div>
+
+        <div class="split-legend">
+          <div class="split-legend-item">
+            <span class="split-legend-dot needs"></span> Needs <span id="needsLegendPct">50%</span>
+          </div>
+          <div class="split-legend-item">
+            <span class="split-legend-dot wants"></span> Wants <span id="wantsLegendPct">30%</span>
+          </div>
+          <div class="split-legend-item">
+            <span class="split-legend-dot savings"></span> Savings <span id="savingsLegendPct">20%</span>
+          </div>
+        </div>
+
+        <!-- Three Budget Cards -->
+        <div class="budget-cards">
+          <!-- Needs Card -->
+          <div class="budget-card needs-card">
+            <div class="card-icon">🏠</div>
+            <div class="card-title">Needs</div>
+            <div class="card-percent" id="needsPercentLabel">50% of income</div>
+            <div class="card-amount" id="needsAmount">—</div>
+            <div class="card-annual" id="needsAnnual">— per year</div>
+            <ul class="guidance-list" id="needsGuidance"></ul>
+          </div>
+
+          <!-- Wants Card -->
+          <div class="budget-card wants-card">
+            <div class="card-icon">🎉</div>
+            <div class="card-title">Wants</div>
+            <div class="card-percent" id="wantsPercentLabel">30% of income</div>
+            <div class="card-amount" id="wantsAmount">—</div>
+            <div class="card-annual" id="wantsAnnual">— per year</div>
+            <ul class="guidance-list" id="wantsGuidance"></ul>
+          </div>
+
+          <!-- Savings Card -->
+          <div class="budget-card savings-card">
+            <div class="card-icon">💰</div>
+            <div class="card-title">Savings</div>
+            <div class="card-percent" id="savingsPercentLabel">20% of income</div>
+            <div class="card-amount" id="savingsAmount">—</div>
+            <div class="card-annual" id="savingsAnnual">— per year</div>
+            <ul class="guidance-list" id="savingsGuidance"></ul>
+          </div>
+        </div>
+
+        <p class="disclaimer">
+          ⚠️ <strong>Disclaimer:</strong> This calculator provides estimates for guidance only. The 50/30/20 rule is a budgeting framework, not financial advice. Your actual expenses will vary based on your location, lifestyle, and individual circumstances.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Gumroad CTA Section ── -->
+  <section>
+    <div class="container">
+      <div class="cta-card">
+        <h3>Get the Complete Budget Planner</h3>
+        <p>Take full control of your finances with our comprehensive budgeting spreadsheet. Track every pound, set savings goals, and see exactly where your money goes — all in one beautifully designed tool.</p>
+        <p class="price">£12.99</p>
+        <a href="https://gumroad.com/l/budget-planner" target="_blank" rel="noopener" class="btn btn-cta">
+          Get the Complete Budget Planner →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Explainer Section ── -->
+  <section class="explainer">
+    <div class="container">
+      <h2>How the 50/30/20 Rule Works</h2>
+
+      <h3>A Simple Framework for Spending</h3>
+      <p>
+        Popularised by US Senator <strong>Elizabeth Warren</strong> (a Harvard bankruptcy expert) and her daughter Amelia Warren Tyagi in their 2005 book <em>All Your Worth: The Ultimate Lifetime Money Plan</em>, the 50/30/20 rule is one of the simplest and most effective budgeting frameworks ever devised.
+      </p>
+      <p>
+        The idea is refreshingly straightforward: take your monthly take-home pay (after tax, NI, pension contributions, and any other deductions) and split it into three buckets:
+      </p>
+      <ul>
+        <li><strong>50% to Needs</strong> — the essentials you can't live without: mortgage or rent, council tax, utilities, groceries, basic transport, and minimum debt payments.</li>
+        <li><strong>30% to Wants</strong> — everything that makes life enjoyable but isn't strictly necessary: eating out, entertainment, holidays, hobbies, streaming subscriptions, and non-essential shopping.</li>
+        <li><strong>20% to Savings</strong> — building your financial future: emergency fund, pension top-ups, ISA contributions, overpaying debts, and investing for long-term goals.</li>
+      </ul>
+
+      <h3>Why It Works</h3>
+      <p>
+        Unlike zero-based budgeting (where you account for every penny), the 50/30/20 rule gives you <strong>structure without micromanagement</strong>. You don't need to track 47 spending categories — just three. It's flexible enough to handle irregular income and variable expenses, yet disciplined enough to ensure you're always saving at least 20% of your income.
+      </p>
+      <p>
+        The percentages aren't set in stone, either. If you live in an expensive city where rent eats up more than 50%, you might adjust to 60/20/20. If you're aggressively saving for a house deposit, 40/30/30 might be your sweet spot. The key insight is having <em>a deliberate split</em> rather than spending reactively.
+      </p>
+
+      <h3>UK-Specific Costs to Consider</h3>
+      <p>
+        When applying the 50/30/20 rule in the UK, your <strong>Needs</strong> category should account for:
+      </p>
+      <ul>
+        <li><strong>Council tax</strong> — This can vary dramatically by council and property band. Budget £100-£300/month depending on your area.</li>
+        <li><strong>Energy bills</strong> — With the UK energy price cap, a typical household pays £130-£200/month for gas and electricity combined.</li>
+        <li><strong>Water rates</strong> — Unlike many countries, UK water isn't free. Expect £30-£50/month depending on your provider and whether you're metered.</li>
+        <li><strong>TV licence</strong> — £169.50/year if you watch live TV or BBC iPlayer. That's about £14/month.</li>
+        <li><strong>Commuting</strong> — UK rail season tickets can be eye-watering. A Zone 1-6 London travelcard is over £300/month. Factor this into Needs.</li>
+      </ul>
+      <p>
+        In the <strong>Savings</strong> bucket, UK residents should prioritise:
+      </p>
+      <ul>
+        <li><strong>Emergency fund</strong> — Aim for 3-6 months of Needs spending. Keep it in an easy-access savings account or premium bonds.</li>
+        <li><strong>ISA allowance</strong> — You can save up to £20,000/year into ISAs tax-free (2025/26). A Stocks & Shares ISA is ideal for long-term investing.</li>
+        <li><strong>Pension contributions</strong> — Beyond workplace auto-enrolment, consider a SIPP for additional retirement savings with tax relief.</li>
+        <li><strong>Lifetime ISA</strong> — If you're under 40 and saving for a first home, the government adds a 25% bonus on up to £4,000/year.</li>
+      </ul>
+
+      <h3>Getting Started</h3>
+      <p>
+        The hardest part is knowing your actual take-home pay. Check your payslip for the amount that hits your bank account <em>after</em> income tax, National Insurance, student loan repayments, and pension contributions. That's your number. Plug it into the calculator above and you'll see exactly where your money should be going.
+      </p>
+      <p>
+        If the split looks unrealistic (e.g., your rent alone exceeds 50% of your take-home pay), don't panic. The rule is a <strong>target to aim for</strong>, not a pass/fail test. Use the custom split to model a more achievable ratio, then work towards closing the gap over time.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="container">
+      <p>
+        <strong>PennyWise</strong> — Free UK financial calculators. Not financial advice.
+        <a href="/">All Tools</a>
+      </p>
+      <p class="text-muted" style="margin-top:0.3rem;">© 2026 PennyWise. Built for UK budgeting.</p>
+    </div>
+  </footer>
+
+  <!-- ── Calculator Logic (inlined from calculator.js) ── -->
+  <script>
+    /**
+     * PennyWise — 50/30/20 Budget Calculator
+     * Splits after-tax income into Needs, Wants, and Savings.
+     * Inlined from budget-calculator/calculator.js
+     */
+    function calculateBudget(opts) {
+      opts = opts || {};
+      var monthlyTakeHome = opts.monthlyTakeHome != null ? opts.monthlyTakeHome : 2500;
+      var customSplit = opts.customSplit || null;
+
+      var split = customSplit || { needs: 50, wants: 30, savings: 20 };
+      var totalPercent = split.needs + split.wants + split.savings;
+
+      if (Math.abs(totalPercent - 100) > 0.01) {
+        return { error: 'Split percentages must total 100%' };
+      }
+
+      var needs = (monthlyTakeHome * split.needs) / 100;
+      var wants = (monthlyTakeHome * split.wants) / 100;
+      var savings = (monthlyTakeHome * split.savings) / 100;
+
+      // UK-specific guidance for each category
+      var guidance = {
+        needs: [
+          'Rent or mortgage payments',
+          'Council tax',
+          'Utility bills (gas, electric, water)',
+          'Groceries and essential food',
+          'Buildings and contents insurance',
+          'Minimum debt repayments',
+          'Commuting costs (car, train, bus)',
+        ],
+        wants: [
+          'Eating out and takeaways',
+          'Entertainment and streaming subscriptions',
+          'Holidays and weekends away',
+          'Shopping and non-essential clothes',
+          'Hobbies, gym, and fitness',
+          'Gifts and celebrations',
+        ],
+        savings: [
+          'Emergency fund (aim for 3-6 months of needs)',
+          'Pension top-ups beyond workplace scheme',
+          'ISA and investment contributions',
+          'Overpaying mortgage or debts',
+          'Saving for a house deposit',
+          'Life insurance and income protection',
+        ],
+      };
+
+      return {
+        monthlyTakeHome: monthlyTakeHome,
+        annualTakeHome: monthlyTakeHome * 12,
+        split: split,
+        needs: Math.round(needs * 100) / 100,
+        wants: Math.round(wants * 100) / 100,
+        savings: Math.round(savings * 100) / 100,
+        needsAnnual: Math.round(needs * 12 * 100) / 100,
+        wantsAnnual: Math.round(wants * 12 * 100) / 100,
+        savingsAnnual: Math.round(savings * 12 * 100) / 100,
+        guidance: guidance,
+        rule: split.needs + '/' + split.wants + '/' + split.savings,
+      };
+    }
+
+    /* ── DOM Interactivity ── */
+    function $(id) { return document.getElementById(id); }
+
+    function formatGBP(n) {
+      return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function formatGBPCompact(n) {
+      if (n >= 1000) {
+        return '£' + (n / 1000).toFixed(1) + 'k';
+      }
+      return formatGBP(n);
+    }
+
+    /* ── State ── */
+    var currentSplit = { needs: 50, wants: 30, savings: 20 };
+    var customSplitActive = false;
+
+    function setPresetSplit(needs, wants, savings) {
+      currentSplit = { needs: needs, wants: wants, savings: savings };
+      customSplitActive = false;
+
+      // Update custom fields
+      $('needsPct').value = needs;
+      $('wantsPct').value = wants;
+      $('savingsPct').value = savings;
+
+      // Hide custom fields and warning
+      $('customSplitFields').classList.remove('active');
+      $('splitWarning').style.display = 'none';
+      $('toggleIcon').textContent = '+';
+
+      // Update active preset button
+      var buttons = document.querySelectorAll('#presetButtons .preset-btn');
+      buttons.forEach(function(btn) {
+        var split = btn.getAttribute('data-split');
+        var parts = split.split('-');
+        if (parseInt(parts[0]) === needs && parseInt(parts[1]) === wants && parseInt(parts[2]) === savings) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      updateResults();
+    }
+
+    function updateSavingsPct() {
+      var needs = parseInt($('needsPct').value, 10) || 0;
+      var wants = parseInt($('wantsPct').value, 10) || 0;
+      var savings = 100 - needs - wants;
+
+      if (savings < 0) {
+        savings = 0;
+      }
+      if (savings > 100) {
+        savings = 100;
+      }
+
+      $('savingsPct').value = savings;
+
+      var total = needs + wants + savings;
+      if (total !== 100) {
+        $('splitWarning').textContent = 'Warning: your percentages total ' + total + '%. They should add up to 100%.';
+        $('splitWarning').style.display = 'block';
+      } else {
+        $('splitWarning').style.display = 'none';
+      }
+
+      currentSplit = { needs: needs, wants: wants, savings: savings };
+
+      // Deactivate preset buttons when custom is tweaked
+      var buttons = document.querySelectorAll('#presetButtons .preset-btn');
+      buttons.forEach(function(btn) { btn.classList.remove('active'); });
+
+      updateResults();
+    }
+
+    function updateResults() {
+      var monthlyTakeHome = parseFloat($('monthlyTakeHome').value) || 0;
+
+      if (monthlyTakeHome <= 0) {
+        $('results').classList.remove('active');
+        return;
+      }
+
+      var result = calculateBudget({
+        monthlyTakeHome: monthlyTakeHome,
+        customSplit: currentSplit
+      });
+
+      // Handle error
+      if (result.error) {
+        $('results').classList.remove('active');
+        $('splitWarning').textContent = result.error;
+        $('splitWarning').style.display = 'block';
+        return;
+      }
+
+      // Show results
+      $('results').classList.add('active');
+
+      // Hero
+      $('monthlyTakeHomeDisplay').textContent = formatGBP(result.monthlyTakeHome);
+      $('annualTakeHomeDisplay').textContent = formatGBP(result.annualTakeHome) + ' per year';
+
+      // Split bar
+      $('needsBar').style.width = result.split.needs + '%';
+      $('needsBar').textContent = result.split.needs + '%';
+      $('wantsBar').style.width = result.split.wants + '%';
+      $('wantsBar').textContent = result.split.wants + '%';
+      $('savingsBar').style.width = result.split.savings + '%';
+      $('savingsBar').textContent = result.split.savings + '%';
+
+      // Hide segment text if segment is too narrow
+      $('needsBar').textContent = result.split.needs >= 12 ? result.split.needs + '%' : '';
+      $('wantsBar').textContent = result.split.wants >= 12 ? result.split.wants + '%' : '';
+      $('savingsBar').textContent = result.split.savings >= 12 ? result.split.savings + '%' : '';
+
+      // Legend
+      $('needsLegendPct').textContent = result.split.needs + '%';
+      $('wantsLegendPct').textContent = result.split.wants + '%';
+      $('savingsLegendPct').textContent = result.split.savings + '%';
+
+      // Budget card amounts
+      $('needsAmount').textContent = formatGBP(result.needs);
+      $('wantsAmount').textContent = formatGBP(result.wants);
+      $('savingsAmount').textContent = formatGBP(result.savings);
+
+      $('needsAnnual').textContent = formatGBP(result.needsAnnual) + ' per year';
+      $('wantsAnnual').textContent = formatGBP(result.wantsAnnual) + ' per year';
+      $('savingsAnnual').textContent = formatGBP(result.savingsAnnual) + ' per year';
+
+      // Percent labels
+      $('needsPercentLabel').textContent = result.split.needs + '% of income';
+      $('wantsPercentLabel').textContent = result.split.wants + '% of income';
+      $('savingsPercentLabel').textContent = result.split.savings + '% of income';
+
+      // Guidance lists
+      function renderGuidance(id, items, category) {
+        var ul = $(id);
+        ul.innerHTML = '';
+        items.forEach(function(item) {
+          var li = document.createElement('li');
+          li.textContent = item;
+          ul.appendChild(li);
+        });
+      }
+
+      renderGuidance('needsGuidance', result.guidance.needs);
+      renderGuidance('wantsGuidance', result.guidance.wants);
+      renderGuidance('savingsGuidance', result.guidance.savings);
+    }
+
+    /* ── Event Handlers ── */
+
+    // Toggle custom split
+    $('toggleCustom').addEventListener('click', function() {
+      customSplitActive = !customSplitActive;
+      var fields = $('customSplitFields');
+      var icon = $('toggleIcon');
+
+      if (customSplitActive) {
+        fields.classList.add('active');
+        icon.textContent = '−';
+        // Sync custom fields to current split
+        $('needsPct').value = currentSplit.needs;
+        $('wantsPct').value = currentSplit.wants;
+        $('savingsPct').value = currentSplit.savings;
+      } else {
+        fields.classList.remove('active');
+        icon.textContent = '+';
+        $('splitWarning').style.display = 'none';
+      }
+    });
+
+    // Preset buttons
+    var presetButtons = document.querySelectorAll('#presetButtons .preset-btn');
+    presetButtons.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var split = this.getAttribute('data-split').split('-');
+        setPresetSplit(parseInt(split[0]), parseInt(split[1]), parseInt(split[2]));
+      });
+    });
+
+    // Custom split inputs
+    $('needsPct').addEventListener('input', updateSavingsPct);
+    $('wantsPct').addEventListener('input', updateSavingsPct);
+
+    // Calculate on button click
+    $('calculateBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      updateResults();
+    });
+
+    // Calculate on input change (debounced)
+    var debounceTimer;
+    $('monthlyTakeHome').addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(updateResults, 300);
+    });
+
+    // Initial calculation
+    updateResults();
+  </script>
+
+</body>
+</html>

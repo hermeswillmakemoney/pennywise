@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UK Rental Yield Calculator · PennyWise</title>
+  <meta name="description" content="Calculate gross yield, net yield, and ROI for buy-to-let properties. Free PennyWise UK rental yield calculator with tax breakdown.">
+
+  <style>
+    /* ── Reset & Tokens ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:        #FFFBF2;
+      --cream-warm:   #FDF6E8;
+      --sand:         #F0E4CE;
+      --amber:        #D4940B;
+      --amber-dark:   #A6710A;
+      --ink:          #2C2416;
+      --ink-soft:     #5A4E3C;
+      --ink-muted:    #8B7E6B;
+      --white:        #FFFFFF;
+      --green:        #2E7D32;
+      --green-light:  #E8F5E9;
+      --green-dark:   #1B3A1B;
+      --red:          #C62828;
+      --red-light:    #FFEBEE;
+      --border:       #E0D5C1;
+      --border-light: #EDE4D3;
+      --shadow-sm:    0 1px 3px rgba(44, 36, 22, 0.06);
+      --shadow-md:    0 4px 16px rgba(44, 36, 22, 0.08);
+      --shadow-lg:    0 8px 32px rgba(44, 36, 22, 0.10);
+      --radius-sm:    8px;
+      --radius-md:    12px;
+      --radius-lg:    16px;
+      --font-serif:   'Georgia', 'Times New Roman', serif;
+      --font-sans:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono:    'SF Mono', 'Fira Code', 'Consolas', monospace;
+      --max-width:    720px;
+    }
+
+    html { font-size: 17px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.65;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Typography ── */
+    h1, h2, h3 { font-family: var(--font-serif); color: var(--ink); line-height: 1.25; }
+    h1 { font-size: 2.2rem; font-weight: 700; }
+    h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+    h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+    p { margin-bottom: 0.85rem; color: var(--ink-soft); }
+    a { color: var(--amber-dark); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; color: var(--amber); }
+
+    .text-muted { color: var(--ink-muted); font-size: 0.9rem; }
+    .text-sm { font-size: 0.85rem; }
+    .text-lg { font-size: 1.1rem; }
+
+    /* ── Layout ── */
+    .container {
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border-light);
+      padding: 0.85rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .nav-logo .coin {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--amber), #C78A0C);
+      color: var(--white);
+      border-radius: 50%;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+    .nav-link {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s;
+    }
+    .nav-link:hover { background: var(--cream-warm); text-decoration: none; color: var(--amber-dark); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 2.5rem 0 2rem;
+      text-align: center;
+      background: linear-gradient(180deg, var(--white) 0%, var(--cream) 100%);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .hero h1 { margin-bottom: 0.5rem; }
+    .hero .subtitle { color: var(--ink-soft); font-size: 1.05rem; max-width: 500px; margin: 0 auto; }
+
+    /* ── Sections ── */
+    section { padding: 2rem 0; }
+    section + section { border-top: 1px solid var(--border-light); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Form ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+    }
+    @media (min-width: 500px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-wrapper:focus-within {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px rgba(212, 148, 11, 0.12);
+    }
+    .input-prefix, .input-suffix {
+      padding: 0 0.65rem;
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      font-weight: 500;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .input-wrapper input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 0.7rem 0.5rem;
+      font-size: 1rem;
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background: transparent;
+      min-width: 0;
+    }
+    .input-wrapper input::placeholder { color: var(--ink-muted); opacity: 0.6; }
+
+    .optional-tag {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-left: 0.25rem;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--amber), #C78A0C);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(212, 148, 11, 0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #C78A0C, var(--amber-dark));
+      box-shadow: 0 4px 14px rgba(212, 148, 11, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn-cta {
+      background: var(--green);
+      color: var(--white);
+      width: 100%;
+      font-size: 1.05rem;
+      padding: 0.9rem 1.75rem;
+      box-shadow: 0 2px 8px rgba(46, 125, 50, 0.25);
+    }
+    .btn-cta:hover {
+      background: #256B28;
+      box-shadow: 0 4px 14px rgba(46, 125, 50, 0.35);
+      transform: translateY(-1px);
+    }
+    .btn-block { width: 100%; }
+
+    /* ── Results ── */
+    .results { display: none; }
+    .results.active { display: block; }
+
+    .result-hero {
+      text-align: center;
+      padding: 1.5rem 0;
+      background: var(--cream-warm);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--sand);
+    }
+    .result-hero .label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      margin-bottom: 0.15rem;
+    }
+    .result-hero .value {
+      font-family: var(--font-serif);
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--amber-dark);
+      line-height: 1.1;
+    }
+    .result-hero .per-month {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      margin-top: 0.1rem;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (min-width: 500px) {
+      .result-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    }
+    .result-item {
+      background: var(--cream-warm);
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 1rem;
+      text-align: center;
+      border: 1px solid var(--border-light);
+    }
+    .result-item .r-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-muted);
+    }
+    .result-item .r-value {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 0.15rem;
+    }
+    .result-item.good-yield .r-value { color: var(--green); }
+    .result-item.poor-yield .r-value { color: var(--red); }
+
+    /* ── Yield Rating Banner ── */
+    .yield-rating {
+      text-align: center;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.25rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .yield-rating.good {
+      background: var(--green-light);
+      color: var(--green);
+      border: 1px solid #C8E6C9;
+    }
+    .yield-rating.ok {
+      background: #FFF8E1;
+      color: #E65100;
+      border: 1px solid #FFECB3;
+    }
+    .yield-rating.poor {
+      background: var(--red-light);
+      color: var(--red);
+      border: 1px solid #FFCDD2;
+    }
+
+    /* ── Breakdown Table ── */
+    .breakdown {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .breakdown h3 {
+      font-size: 1rem;
+      padding: 1rem 1.25rem 0.5rem;
+    }
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1.25rem;
+      font-size: 0.92rem;
+    }
+    .breakdown-row + .breakdown-row { border-top: 1px solid var(--border-light); }
+    .breakdown-row .b-label { color: var(--ink-soft); }
+    .breakdown-row .b-value { font-weight: 600; color: var(--ink); }
+    .breakdown-row .b-value.negative { color: var(--red); }
+    .breakdown-row .b-value.positive { color: var(--green); }
+    .breakdown-row.sub {
+      padding-left: 2.25rem;
+      font-size: 0.85rem;
+    }
+    .breakdown-row.sub .b-label { color: var(--ink-muted); }
+    .breakdown-row.total {
+      background: var(--cream-warm);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .breakdown-row.total .b-label { color: var(--ink); }
+    .breakdown-row.total .b-value { font-size: 1.05rem; }
+
+    /* ── CTA Card ── */
+    .cta-card {
+      background: linear-gradient(135deg, #1B3A1B, #2E5A2E);
+      color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      text-align: center;
+    }
+    .cta-card h3 {
+      color: var(--white);
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+    .cta-card p { color: rgba(255,255,255,0.8); margin-bottom: 1rem; }
+    .cta-card .price { font-size: 1.1rem; font-weight: 700; color: #A5D6A7; }
+
+    /* ── Explainer ── */
+    .explainer p { font-size: 0.95rem; }
+    .explainer ul {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+    .explainer ul li {
+      position: relative;
+      padding-left: 1.4rem;
+      margin-bottom: 0.5rem;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+    }
+    .explainer ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--amber);
+      font-weight: 700;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: auto;
+      background: var(--white);
+      border-top: 1px solid var(--border-light);
+      padding: 1.5rem 0;
+      text-align: center;
+    }
+    .footer p { font-size: 0.85rem; color: var(--ink-muted); margin: 0; }
+    .footer a { font-weight: 500; }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+      background: var(--cream-warm);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      margin-top: 1rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      html { font-size: 15px; }
+      h1 { font-size: 1.7rem; }
+      .result-hero .value { font-size: 2.2rem; }
+      .result-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ── -->
+  <nav class="nav">
+    <div class="container">
+      <a href="/" class="nav-logo" aria-label="PennyWise Home">
+        <span class="coin">P</span> PennyWise
+      </a>
+      <a href="/" class="nav-link">All Tools</a>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <header class="hero">
+    <div class="container">
+      <h1>UK Rental Yield Calculator</h1>
+      <p class="subtitle">Calculate gross yield, net yield, and ROI for buy-to-let properties</p>
+    </div>
+  </header>
+
+  <!-- ── Calculator Section ── -->
+  <section id="calculator">
+    <div class="container">
+      <div class="card">
+        <h2>Property &amp; Rental Details</h2>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="propertyPrice">Property Price</label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="propertyPrice" placeholder="250,000" value="250000" min="1" step="1000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="monthlyRent">Monthly Rent</label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="monthlyRent" placeholder="1,100" value="1100" min="1" step="10">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="voidPeriods">
+              Void Periods
+              <span class="optional-tag">(optional)</span>
+            </label>
+            <div class="input-wrapper">
+              <input type="number" id="voidPeriods" placeholder="2" value="2" min="0" max="52" step="1">
+              <span class="input-suffix">weeks/yr</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="taxRate">Tax Rate</label>
+            <div class="input-wrapper">
+              <input type="number" id="taxRate" placeholder="20" value="20" min="0" max="47" step="1">
+              <span class="input-suffix">%</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="mortgageInterest">
+              Mortgage Interest
+              <span class="optional-tag">(optional)</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="mortgageInterest" placeholder="Auto" value="0" min="0" step="100">
+              <span class="input-suffix">/yr</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="insurance">
+              Landlord Insurance
+              <span class="optional-tag">(optional)</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="insurance" placeholder="300" value="0" min="0" step="10">
+              <span class="input-suffix">/yr</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="maintenance">
+              Maintenance &amp; Repairs
+              <span class="optional-tag">(optional)</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="maintenance" placeholder="Auto" value="0" min="0" step="50">
+              <span class="input-suffix">/yr</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="serviceCharge">Service Charge</label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="serviceCharge" placeholder="0" value="0" min="0" step="50">
+              <span class="input-suffix">/yr</span>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label for="groundRent">Ground Rent</label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="groundRent" placeholder="0" value="0" min="0" step="10">
+              <span class="input-suffix">/yr</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="calculateBtn" style="margin-top:1.25rem;">
+          Calculate Rental Yield
+        </button>
+      </div>
+
+      <!-- ── Results ── -->
+      <div class="results" id="results">
+        <div class="result-hero">
+          <div class="label">Net Yield After Tax</div>
+          <div class="value" id="netYieldAfterTaxHero">—</div>
+          <div class="per-month">annual return on property value</div>
+        </div>
+
+        <div class="yield-rating" id="yieldRating" style="display:none;"></div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="r-label">Gross Yield</div>
+            <div class="r-value" id="grossYield">—</div>
+          </div>
+          <div class="result-item">
+            <div class="r-label">Net Yield</div>
+            <div class="r-value" id="netYield">—</div>
+          </div>
+          <div class="result-item">
+            <div class="r-label">Net After Tax</div>
+            <div class="r-value" id="netYieldAfterTax">—</div>
+          </div>
+          <div class="result-item">
+            <div class="r-label">ROI (on Deposit)</div>
+            <div class="r-value" id="roi">—</div>
+          </div>
+        </div>
+
+        <!-- Breakdown -->
+        <div class="breakdown" id="breakdown">
+          <h3>Income &amp; Costs Breakdown</h3>
+          <div class="breakdown-row">
+            <span class="b-label">Annual Rental Income</span>
+            <span class="b-value" id="bkAnnualRent">—</span>
+          </div>
+          <div class="breakdown-row sub">
+            <span class="b-label">Void Period Deduction</span>
+            <span class="b-value negative" id="bkVoidDeduction">—</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="b-label">Effective Rental Income</span>
+            <span class="b-value" id="bkEffectiveRent">—</span>
+          </div>
+          <div class="breakdown-row" style="padding-top:0.8rem;">
+            <span class="b-label" style="font-weight:600;">Annual Costs</span>
+            <span class="b-value" style="font-weight:400;"></span>
+          </div>
+          <div class="breakdown-row sub">
+            <span class="b-label">Mortgage Interest</span>
+            <span class="b-value" id="bkMortInt">—</span>
+          </div>
+          <div class="breakdown-row sub">
+            <span class="b-label">Insurance</span>
+            <span class="b-value" id="bkInsurance">—</span>
+          </div>
+          <div class="breakdown-row sub">
+            <span class="b-label">Maintenance</span>
+            <span class="b-value" id="bkMaintenance">—</span>
+          </div>
+          <div class="breakdown-row sub">
+            <span class="b-label">Service Charge</span>
+            <span class="b-value" id="bkServiceCharge">—</span>
+          </div>
+          <div class="breakdown-row sub">
+            <span class="b-label">Ground Rent</span>
+            <span class="b-value" id="bkGroundRent">—</span>
+          </div>
+          <div class="breakdown-row total">
+            <span class="b-label">Total Costs</span>
+            <span class="b-value" id="bkTotalCosts">—</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="b-label">Net Income Before Tax</span>
+            <span class="b-value positive" id="bkNetBeforeTax">—</span>
+          </div>
+          <div class="breakdown-row sub">
+            <span class="b-label">Tax Due</span>
+            <span class="b-value negative" id="bkTaxDue">—</span>
+          </div>
+          <div class="breakdown-row total">
+            <span class="b-label">Net Income After Tax</span>
+            <span class="b-value positive" id="bkNetAfterTax">—</span>
+          </div>
+        </div>
+
+        <p class="disclaimer">
+          ⚠️ <strong>Disclaimer:</strong> This calculator provides estimates for guidance only. It assumes interest-only mortgage costs and uses simplified tax calculations. Actual yields depend on your specific circumstances, mortgage terms, and tax position. Always consult a qualified financial advisor or accountant before making investment decisions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Gumroad CTA Section ── -->
+  <section>
+    <div class="container">
+      <div class="cta-card">
+        <h3>Get the Landlord Tracker</h3>
+        <p>Manage your entire property portfolio in one place. Track rent collection, expenses, mortgage payments, and tax obligations across all your buy-to-let properties.</p>
+        <p class="price">£11.99</p>
+        <a href="https://gumroad.com/l/landlord-tracker" target="_blank" rel="noopener" class="btn btn-cta">
+          Get the Landlord Tracker →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Explainer Section ── -->
+  <section class="explainer">
+    <div class="container">
+      <h2>Understanding Rental Yield</h2>
+
+      <h3>Gross Yield vs Net Yield</h3>
+      <p>
+        <strong>Gross yield</strong> is the simplest measure: annual rent divided by the property price, expressed as a percentage. It doesn't account for any costs, so it's a useful quick comparison tool but can be misleading. A £200,000 property renting at £1,000/month has a 6% gross yield — sounds great, but the real return may be much lower after costs.
+      </p>
+      <p>
+        <strong>Net yield</strong> deducts all your running costs from the rental income before calculating the percentage return. This includes mortgage interest, insurance, maintenance, service charges, ground rent, and void periods (when the property sits empty between tenancies). Net yield gives you a much more realistic picture of your actual return.
+      </p>
+
+      <h3>What Costs Should You Expect?</h3>
+      <ul>
+        <li><strong>Mortgage interest</strong> — Most buy-to-let mortgages are interest-only. At current rates (4–6%), a 75% LTV mortgage on a £250,000 property costs roughly £700–£950/month in interest alone.</li>
+        <li><strong>Landlord insurance</strong> — Typically £200–£400/year. Covers buildings, liability, and loss of rent.</li>
+        <li><strong>Maintenance &amp; repairs</strong> — Budget at least 0.5–1% of the property value per year. On a £250,000 property, that's £1,250–£2,500.</li>
+        <li><strong>Service charges &amp; ground rent</strong> — Leasehold properties come with annual charges that can range from a few hundred to several thousand pounds, especially in modern apartment blocks.</li>
+        <li><strong>Void periods</strong> — Assume 2–4 weeks per year where the property is empty between tenancies. In a £1,100/month rental, 3 weeks' void costs you ~£760 in lost income.</li>
+        <li><strong>Letting agent fees</strong> — If you use an agent, expect 8–15% of rent for full management, or a one-off fee for tenant-find only. Many landlords self-manage to save this cost.</li>
+      </ul>
+
+      <h3>UK Tax Implications for Landlords</h3>
+      <p>
+        Since April 2020, <strong>mortgage interest tax relief</strong> has been restricted for individual landlords. You can no longer deduct mortgage interest as a business expense — instead, you receive a <strong>20% tax credit</strong> on your mortgage interest payments. This means higher-rate taxpayers (40% or 45%) only get basic-rate relief on their mortgage costs, significantly reducing net returns.
+      </p>
+      <p>
+        Rental income is added to your other income and taxed at your marginal rate (20%, 40%, or 45% in England, Wales &amp; Northern Ireland; different bands apply in Scotland). You <em>can</em> still deduct other allowable expenses including insurance, maintenance, service charges, ground rent, and letting agent fees. Keep detailed records — HMRC expects you to report rental income via Self Assessment each year.
+      </p>
+
+      <h3>What's a Good Rental Yield?</h3>
+      <ul>
+        <li><strong>6%+ net yield</strong> — Excellent. You're likely in a high-demand, lower-price area (common in the North of England, Scotland, and Wales).</li>
+        <li><strong>4–6% net yield</strong> — Solid. Covers costs with a reasonable profit margin. Typical for most UK regions.</li>
+        <li><strong>2–4% net yield</strong> — Marginal. You may be relying heavily on capital appreciation. Common in London and the South East where property prices are high relative to rents.</li>
+        <li><strong>Below 2% net yield</strong> — Risky. One major repair or extended void could wipe out years of profit. Consider whether capital growth justifies the low income return.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="container">
+      <p>
+        <strong>PennyWise</strong> — Free UK financial calculators. Not financial advice.
+        <a href="/">All Tools</a>
+      </p>
+      <p class="text-muted" style="margin-top:0.3rem;">© 2026 PennyWise. Built for UK landlords.</p>
+    </div>
+  </footer>
+
+  <!-- ── Calculator Logic (inlined from calculator.js) ── -->
+  <script>
+    /**
+     * PennyWise — UK Rental Yield Calculator
+     * Gross yield, net yield, and ROI for buy-to-let properties.
+     * Inlined and adapted from calculator.js for DOM interactivity.
+     */
+    function calculateRentalYield(opts) {
+      opts = opts || {};
+      var propertyPrice = opts.propertyPrice != null ? opts.propertyPrice : 250000;
+      var monthlyRent = opts.monthlyRent != null ? opts.monthlyRent : 1100;
+      var mortgageInterest = opts.mortgageInterest || 0;
+      var insurance = opts.insurance || 0;
+      var maintenance = opts.maintenance || 0;
+      var serviceCharge = opts.serviceCharge || 0;
+      var groundRent = opts.groundRent || 0;
+      var voidPeriods = opts.voidPeriods || 0;
+      var taxRate = opts.taxRate != null ? opts.taxRate : 20;
+
+      var annualRent = monthlyRent * 12;
+
+      // Void period adjustment
+      var voidWeeks = Math.min(voidPeriods, 52);
+      var voidDeduction = (annualRent / 52) * voidWeeks;
+      var effectiveRent = annualRent - voidDeduction;
+
+      // Gross yield
+      var grossYield = propertyPrice > 0 ? (annualRent / propertyPrice) * 100 : 0;
+
+      // Sensible defaults for costs not explicitly provided
+      var mortInt = mortgageInterest > 0 ? mortgageInterest : (propertyPrice * 0.75 * 0.045);
+      var ins = insurance > 0 ? insurance : 300;
+      var maint = maintenance > 0 ? maintenance : (propertyPrice * 0.005);
+      var svcCharge = serviceCharge || 0;
+      var gRent = groundRent || 0;
+
+      var totalCosts = mortInt + ins + maint + svcCharge + gRent;
+
+      var costBreakdown = {
+        mortgageInterest: Math.round(mortInt * 100) / 100,
+        insurance: Math.round(ins * 100) / 100,
+        maintenance: Math.round(maint * 100) / 100,
+        serviceCharge: Math.round(svcCharge * 100) / 100,
+        groundRent: Math.round(gRent * 100) / 100
+      };
+
+      var netIncome = effectiveRent - totalCosts;
+      var netYield = propertyPrice > 0 ? (netIncome / propertyPrice) * 100 : 0;
+
+      // Tax on rental income
+      var taxableIncome = Math.max(0, netIncome);
+      var taxDue = (taxableIncome * taxRate) / 100;
+      var netAfterTax = netIncome - taxDue;
+      var netYieldAfterTax = propertyPrice > 0 ? (netAfterTax / propertyPrice) * 100 : 0;
+
+      // ROI based on typical 25% BTL deposit
+      var deposit = propertyPrice * 0.25;
+      var roi = deposit > 0 ? (netAfterTax / deposit) * 100 : 0;
+
+      return {
+        propertyPrice: propertyPrice,
+        monthlyRent: monthlyRent,
+        deposit: Math.round(deposit * 100) / 100,
+        grossYield: Math.round(grossYield * 100) / 100,
+        netIncome: Math.round(netIncome * 100) / 100,
+        netYield: Math.round(netYield * 100) / 100,
+        taxDue: Math.round(taxDue * 100) / 100,
+        netAfterTax: Math.round(netAfterTax * 100) / 100,
+        netYieldAfterTax: Math.round(netYieldAfterTax * 100) / 100,
+        roi: Math.round(roi * 100) / 100,
+        breakdown: {
+          annualRent: Math.round(annualRent * 100) / 100,
+          voidDeduction: Math.round(voidDeduction * 100) / 100,
+          effectiveRent: Math.round(effectiveRent * 100) / 100,
+          costs: costBreakdown,
+          totalCosts: Math.round(totalCosts * 100) / 100
+        }
+      };
+    }
+
+    /* ── DOM Interactivity ── */
+    function $(id) { return document.getElementById(id); }
+
+    function formatGBP(n) {
+      return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function formatPct(n) {
+      return n.toFixed(2) + '%';
+    }
+
+    function getYieldRating(netYieldAfterTax) {
+      if (netYieldAfterTax >= 6) return { cls: 'good', text: 'Excellent yield — strong returns relative to property value.' };
+      if (netYieldAfterTax >= 4) return { cls: 'ok', text: 'Solid yield — in line with typical UK buy-to-let returns.' };
+      if (netYieldAfterTax >= 2) return { cls: 'ok', text: 'Marginal yield — you may be relying on capital appreciation for returns.' };
+      return { cls: 'poor', text: 'Low yield — review costs and rent. Capital growth may be your primary return.' };
+    }
+
+    function updateResults() {
+      var propertyPrice = parseFloat($('propertyPrice').value) || 0;
+      var monthlyRent = parseFloat($('monthlyRent').value) || 0;
+      var voidPeriods = parseFloat($('voidPeriods').value) || 0;
+      var mortgageInterest = parseFloat($('mortgageInterest').value) || 0;
+      var insurance = parseFloat($('insurance').value) || 0;
+      var maintenance = parseFloat($('maintenance').value) || 0;
+      var serviceCharge = parseFloat($('serviceCharge').value) || 0;
+      var groundRent = parseFloat($('groundRent').value) || 0;
+      var taxRate = parseFloat($('taxRate').value);
+      if (isNaN(taxRate)) taxRate = 20;
+
+      if (propertyPrice <= 0 || monthlyRent <= 0) {
+        $('results').classList.remove('active');
+        return;
+      }
+
+      var result = calculateRentalYield({
+        propertyPrice: propertyPrice,
+        monthlyRent: monthlyRent,
+        voidPeriods: voidPeriods,
+        mortgageInterest: mortgageInterest,
+        insurance: insurance,
+        maintenance: maintenance,
+        serviceCharge: serviceCharge,
+        groundRent: groundRent,
+        taxRate: taxRate
+      });
+
+      // Show results
+      $('results').classList.add('active');
+
+      // Hero
+      $('netYieldAfterTaxHero').textContent = formatPct(result.netYieldAfterTax);
+
+      // Result grid
+      $('grossYield').textContent = formatPct(result.grossYield);
+      $('netYield').textContent = formatPct(result.netYield);
+      $('netYieldAfterTax').textContent = formatPct(result.netYieldAfterTax);
+      $('roi').textContent = formatPct(result.roi);
+
+      // Yield rating
+      var rating = getYieldRating(result.netYieldAfterTax);
+      var ratingEl = $('yieldRating');
+      ratingEl.style.display = 'block';
+      ratingEl.className = 'yield-rating ' + rating.cls;
+      ratingEl.textContent = rating.text;
+
+      // Breakdown
+      var bd = result.breakdown;
+      $('bkAnnualRent').textContent = formatGBP(bd.annualRent);
+      $('bkVoidDeduction').textContent = '−' + formatGBP(bd.voidDeduction);
+      $('bkEffectiveRent').textContent = formatGBP(bd.effectiveRent);
+      $('bkMortInt').textContent = formatGBP(bd.costs.mortgageInterest);
+      $('bkInsurance').textContent = formatGBP(bd.costs.insurance);
+      $('bkMaintenance').textContent = formatGBP(bd.costs.maintenance);
+      $('bkServiceCharge').textContent = formatGBP(bd.costs.serviceCharge);
+      $('bkGroundRent').textContent = formatGBP(bd.costs.groundRent);
+      $('bkTotalCosts').textContent = formatGBP(bd.totalCosts);
+      $('bkNetBeforeTax').textContent = formatGBP(result.netIncome);
+      $('bkTaxDue').textContent = '−' + formatGBP(result.taxDue);
+      $('bkNetAfterTax').textContent = formatGBP(result.netAfterTax);
+
+      // Color negative/positive values
+      var netVal = $('bkNetBeforeTax');
+      var netAT = $('bkNetAfterTax');
+      netVal.className = 'b-value ' + (result.netIncome >= 0 ? 'positive' : 'negative');
+      netAT.className = 'b-value ' + (result.netAfterTax >= 0 ? 'positive' : 'negative');
+    }
+
+    // Calculate on page load
+    updateResults();
+
+    // Calculate on button click
+    $('calculateBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      updateResults();
+    });
+
+    // Calculate on input change (debounced)
+    var debounceTimer;
+    var inputs = document.querySelectorAll('input[type="number"]');
+    inputs.forEach(function(input) {
+      input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(updateResults, 300);
+      });
+    });
+  </script>
+
+</body>
+</html>

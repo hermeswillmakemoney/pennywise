@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UK Free Tools — Calculators That Save You Money</title>
+<style>
+:root { --bg: #fafafa; --fg: #1a1a1a; --accent: #1a6b4a; --card: #fff; --border: #e5e5e5; --muted: #666; }
+body { margin:0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--fg); line-height:1.6; }
+main { max-width: 900px; margin:0 auto; padding: 40px 20px; }
+h1 { font-size: 2.2rem; margin-bottom:.3rem; }
+.subtitle { color: var(--muted); font-size:1.1rem; margin-bottom:2rem; }
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap:20px; }
+.card { background: var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; transition: box-shadow .2s; }
+.card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+.card h3 { margin:0 0 .5rem; font-size:1.2rem; }
+.card p { color:var(--muted); font-size:.92rem; margin:0 0 1rem; }
+.card a { color:var(--accent); font-weight:600; text-decoration:none; }
+.coming-soon { opacity:.5; pointer-events:none; }
+    <title>PennyWise — Free UK Money Calculators</title>
+    <meta name="description" content="Free calculators that help you keep more of your money. Salary, stamp duty, mortgage, VAT, budget, and more." />
+</head>
+<body>
+<main>
+<h1>PennyWise</h1>
+<p class="subtitle">Free calculators that help you keep more of your money. No sign-up, no ads, no nonsense.</p>
+<div class="grid" id="tool-grid">
+<!-- Populated by JS -->
+</div>
+</main>
+<script>
+const tools = [
+  { name: "Salary Calculator", desc: "See your take-home pay after tax, NI, student loans, and pension — 2025/26 rates.", slug: "salary-calculator" },
+  { name: "Stamp Duty Calculator", desc: "Calculate SDLT on any UK property — first-time buyer, BTL, second home, non-resident.", slug: "stamp-duty-calculator" },
+  { name: "Mortgage Repayment Calculator", desc: "Monthly repayments, total interest, LTV, and overpayment savings.", slug: "mortgage-calculator" },
+  { name: "VAT Calculator", desc: "Add or remove VAT at standard 20%, reduced 5%, zero 0%, or custom rate.", slug: "vat-calculator" },
+  { name: "50/30/20 Budget Calculator", desc: "Split your take-home pay into Needs, Wants, and Savings with UK guidance.", slug: "budget-calculator" },
+  { name: "Rental Yield Calculator", desc: "Gross yield, net yield, ROI, and tax for buy-to-let investments.", slug: "rental-yield-calculator" },
+];
+const grid = document.getElementById('tool-grid');
+tools.forEach(t => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<h3>${t.name}</h3><p>${t.desc}</p><a href="/${t.slug}/">Try it →</a>`;
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>
