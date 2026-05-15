@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UK Mortgage Repayment Calculator · PennyWise</title>
+  <meta name="description" content="Calculate your UK mortgage repayments, see total interest costs, and discover how overpayments can save you thousands. Free PennyWise calculator.">
+<link rel="canonical" href="https://hermeswillmakemoney.github.io/pennywise/mortgage-calculator/" />
+<meta property="og:title" content="UK Mortgage Repayment Calculator · PennyWise" />
+<meta property="og:description" content="Calculate your UK mortgage repayments, see total interest costs, and discover how overpayments can save you thousands. Free PennyWise calculator." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://hermeswillmakemoney.github.io/pennywise/mortgage-calculator/" />
+<meta property="og:locale" content="en_GB" />
+<meta name="twitter:card" content="summary" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "UK Mortgage Repayment Calculator",
+  "url": "https://hermeswillmakemoney.github.io/pennywise/mortgage-calculator/",
+  "description": "Calculate your UK mortgage repayments, see total interest costs, and discover how overpayments can save you thousands. Free PennyWise calculator.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "GBP"
+  }
+}
+</script>
+
+  <style>
+    /* ── Reset & Tokens ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:        #FFFBF2;
+      --cream-warm:   #FDF6E8;
+      --sand:         #F0E4CE;
+      --amber:        #D4940B;
+      --amber-dark:   #A6710A;
+      --ink:          #2C2416;
+      --ink-soft:     #5A4E3C;
+      --ink-muted:    #8B7E6B;
+      --white:        #FFFFFF;
+      --green:        #2E7D32;
+      --green-light:  #E8F5E9;
+      --red:          #C62828;
+      --red-light:    #FFEBEE;
+      --border:       #E0D5C1;
+      --border-light: #EDE4D3;
+      --shadow-sm:    0 1px 3px rgba(44, 36, 22, 0.06);
+      --shadow-md:    0 4px 16px rgba(44, 36, 22, 0.08);
+      --shadow-lg:    0 8px 32px rgba(44, 36, 22, 0.10);
+      --radius-sm:    8px;
+      --radius-md:    12px;
+      --radius-lg:    16px;
+      --font-serif:   'Georgia', 'Times New Roman', serif;
+      --font-sans:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono:    'SF Mono', 'Fira Code', 'Consolas', monospace;
+      --max-width:    720px;
+    }
+
+    html { font-size: 17px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.65;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Typography ── */
+    h1, h2, h3 { font-family: var(--font-serif); color: var(--ink); line-height: 1.25; }
+    h1 { font-size: 2.2rem; font-weight: 700; }
+    h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+    h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+    p { margin-bottom: 0.85rem; color: var(--ink-soft); }
+    a { color: var(--amber-dark); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; color: var(--amber); }
+
+    .text-muted { color: var(--ink-muted); font-size: 0.9rem; }
+    .text-sm { font-size: 0.85rem; }
+    .text-lg { font-size: 1.1rem; }
+
+    /* ── Layout ── */
+    .container {
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border-light);
+      padding: 0.85rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .nav-logo .coin {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--amber), #C78A0C);
+      color: var(--white);
+      border-radius: 50%;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+    .nav-link {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s;
+    }
+    .nav-link:hover { background: var(--cream-warm); text-decoration: none; color: var(--amber-dark); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 2.5rem 0 2rem;
+      text-align: center;
+      background: linear-gradient(180deg, var(--white) 0%, var(--cream) 100%);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .hero h1 { margin-bottom: 0.5rem; }
+    .hero .subtitle { color: var(--ink-soft); font-size: 1.05rem; max-width: 500px; margin: 0 auto; }
+
+    /* ── Sections ── */
+    section { padding: 2rem 0; }
+    section + section { border-top: 1px solid var(--border-light); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Form ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+    }
+    @media (min-width: 500px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-wrapper:focus-within {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px rgba(212, 148, 11, 0.12);
+    }
+    .input-prefix, .input-suffix {
+      padding: 0 0.65rem;
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      font-weight: 500;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .input-wrapper input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 0.7rem 0.5rem;
+      font-size: 1rem;
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background: transparent;
+      min-width: 0;
+    }
+    .input-wrapper input::placeholder { color: var(--ink-muted); opacity: 0.6; }
+
+    .optional-tag {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-left: 0.25rem;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--amber), #C78A0C);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(212, 148, 11, 0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #C78A0C, var(--amber-dark));
+      box-shadow: 0 4px 14px rgba(212, 148, 11, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn-cta {
+      background: var(--green);
+      color: var(--white);
+      width: 100%;
+      font-size: 1.05rem;
+      padding: 0.9rem 1.75rem;
+      box-shadow: 0 2px 8px rgba(46, 125, 50, 0.25);
+    }
+    .btn-cta:hover {
+      background: #256B28;
+      box-shadow: 0 4px 14px rgba(46, 125, 50, 0.35);
+      transform: translateY(-1px);
+    }
+    .btn-block { width: 100%; }
+
+    /* ── Results ── */
+    .results { display: none; }
+    .results.active { display: block; }
+
+    .result-hero {
+      text-align: center;
+      padding: 1.5rem 0;
+      background: var(--cream-warm);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--sand);
+    }
+    .result-hero .label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      margin-bottom: 0.15rem;
+    }
+    .result-hero .value {
+      font-family: var(--font-serif);
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--amber-dark);
+      line-height: 1.1;
+    }
+    .result-hero .per-month {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      margin-top: 0.1rem;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .result-item {
+      background: var(--cream-warm);
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 1rem;
+      text-align: center;
+      border: 1px solid var(--border-light);
+    }
+    .result-item .r-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-muted);
+    }
+    .result-item .r-value {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 0.15rem;
+    }
+    .result-item.ltv-warning .r-value { color: var(--red); }
+
+    /* ── Overpayment Box ── */
+    .overpayment-results {
+      display: none;
+      margin-top: 1rem;
+    }
+    .overpayment-results.active { display: block; }
+
+    .savings-banner {
+      background: var(--green-light);
+      border: 1px solid #C8E6C9;
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .savings-banner .saved-amount {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--green);
+    }
+    .savings-banner .saved-label {
+      font-size: 0.85rem;
+      color: #2E7D32;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .overpayment-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    @media (min-width: 500px) {
+      .overpayment-grid { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    /* ── CTA Card ── */
+    .cta-card {
+      background: linear-gradient(135deg, #1B3A1B, #2E5A2E);
+      color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      text-align: center;
+    }
+    .cta-card h3 {
+      color: var(--white);
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+    .cta-card p { color: rgba(255,255,255,0.8); margin-bottom: 1rem; }
+    .cta-card .price { font-size: 1.1rem; font-weight: 700; color: #A5D6A7; }
+
+    /* ── Explainer ── */
+    .explainer p { font-size: 0.95rem; }
+    .explainer ul {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+    .explainer ul li {
+      position: relative;
+      padding-left: 1.4rem;
+      margin-bottom: 0.5rem;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+    }
+    .explainer ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--amber);
+      font-weight: 700;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: auto;
+      background: var(--white);
+      border-top: 1px solid var(--border-light);
+      padding: 1.5rem 0;
+      text-align: center;
+    }
+    .footer p { font-size: 0.85rem; color: var(--ink-muted); margin: 0; }
+    .footer a { font-weight: 500; }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+      background: var(--cream-warm);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      margin-top: 1rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      html { font-size: 15px; }
+      h1 { font-size: 1.7rem; }
+      .result-hero .value { font-size: 2.2rem; }
+      .result-grid { grid-template-columns: 1fr; }
+      .overpayment-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ── -->
+  <nav class="nav">
+    <div class="container">
+      <a href="/pennywise/" class="nav-logo" aria-label="PennyWise Home">
+        <span class="coin">P</span> PennyWise
+      </a>
+      <a href="/pennywise/" class="nav-link">All Tools</a>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <header class="hero">
+    <div class="container">
+      <h1>UK Mortgage Repayment Calculator</h1>
+      <p class="subtitle">See your monthly repayments at a glance — and discover how much you could save by overpaying, even just a little each month.</p>
+    </div>
+  </header>
+
+  <!-- ── Calculator Section ── -->
+  <section id="calculator">
+    <div class="container">
+      <div class="card">
+        <h2>Enter Your Mortgage Details</h2>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="propertyPrice">Property Price</label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="propertyPrice" placeholder="300,000" value="300000" min="1" step="1000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="deposit">Deposit</label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="deposit" placeholder="45,000" value="45000" min="0" step="500">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="interestRate">Interest Rate</label>
+            <div class="input-wrapper">
+              <input type="number" id="interestRate" placeholder="4.5" value="4.5" min="0" max="30" step="0.1">
+              <span class="input-suffix">%</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="termYears">Term</label>
+            <div class="input-wrapper">
+              <input type="number" id="termYears" placeholder="25" value="25" min="1" max="50" step="1">
+              <span class="input-suffix">years</span>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label for="overpayment">
+              Monthly Overpayment
+              <span class="optional-tag">(optional)</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="overpayment" placeholder="0" value="0" min="0" step="10">
+              <span class="input-suffix">/mo</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="calculateBtn" style="margin-top:1.25rem;">
+          Calculate Repayments
+        </button>
+      </div>
+
+      <!-- ── Results ── -->
+      <div class="results" id="results">
+        <div class="result-hero">
+          <div class="label">Your Monthly Repayment</div>
+          <div class="value" id="monthlyPayment">—</div>
+          <div class="per-month">per month</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="r-label">Total Interest</div>
+            <div class="r-value" id="totalInterest">—</div>
+          </div>
+          <div class="result-item">
+            <div class="r-label">Total Payable</div>
+            <div class="r-value" id="totalPayable">—</div>
+          </div>
+          <div class="result-item">
+            <div class="r-label">Loan Amount</div>
+            <div class="r-value" id="loanAmount">—</div>
+          </div>
+          <div class="result-item" id="ltvItem">
+            <div class="r-label">Loan-to-Value (LTV)</div>
+            <div class="r-value" id="ltv">—</div>
+          </div>
+        </div>
+
+        <!-- Overpayment Results -->
+        <div class="overpayment-results" id="overpaymentResults">
+          <div class="savings-banner">
+            <div class="saved-label">You Could Save</div>
+            <div class="saved-amount" id="interestSaved">—</div>
+            <div class="saved-label" style="margin-top:0.3rem;">in interest by overpaying</div>
+          </div>
+
+          <div class="overpayment-grid">
+            <div class="result-item">
+              <div class="r-label">Time Saved</div>
+              <div class="r-value" id="timeSaved">—</div>
+            </div>
+            <div class="result-item">
+              <div class="r-label">New Term</div>
+              <div class="r-value" id="newTerm">—</div>
+            </div>
+            <div class="result-item">
+              <div class="r-label">Paid Off By</div>
+              <div class="r-value" id="paidOffDate" style="font-size:1.15rem;">—</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="disclaimer">
+          ⚠️ <strong>Disclaimer:</strong> This calculator provides estimates for guidance only. Actual mortgage terms depend on your lender, credit score, and market conditions. Always consult a qualified mortgage advisor before making financial decisions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Gumroad CTA Section ── -->
+  <section>
+    <div class="container">
+      <div class="cta-card">
+        <h3>Get the Complete Budget Planner</h3>
+        <p>Take control of your finances with our comprehensive budgeting spreadsheet. Track income, expenses, debt, and savings — all in one place.</p>
+        <p class="price">£9.99</p>
+        <a href="https://gumroad.com/l/budget-planner" target="_blank" rel="noopener" class="btn btn-cta">
+          Get the Complete Budget Planner →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Explainer Section ── -->
+  <section class="explainer">
+    <div class="container">
+      <h2>How Does a UK Mortgage Work?</h2>
+
+      <h3>Amortisation Explained</h3>
+      <p>
+        Most UK mortgages use <strong>capital repayment</strong> (also called amortisation). Each monthly payment covers both the interest charged on your outstanding loan balance and a portion of the capital you borrowed. In the early years, most of your payment goes towards interest. Over time, as the loan balance shrinks, more of each payment chips away at the capital.
+      </p>
+      <p>
+        This is why even small overpayments early in your mortgage can have an outsized impact — they reduce the balance that future interest is calculated on, creating a compounding saving effect.
+      </p>
+
+      <h3>Why Overpay?</h3>
+      <ul>
+        <li><strong>Save thousands in interest</strong> — Overpaying by just £100/month on a £200,000 mortgage at 5% could save you over £30,000 in interest.</li>
+        <li><strong>Become mortgage-free sooner</strong> — Regular overpayments can slash years off your term, giving you financial freedom earlier.</li>
+        <li><strong>Reduce your LTV</strong> — A lower loan-to-value ratio unlocks better remortgage rates when your fixed term ends.</li>
+        <li><strong>Beat savings rates</strong> — Overpaying a 5% mortgage is equivalent to earning 5% tax-free on savings — often better than any savings account.</li>
+      </ul>
+
+      <h3>Important Considerations</h3>
+      <p>
+        Most UK lenders allow you to overpay up to <strong>10% of the outstanding balance per year</strong> without an early repayment charge (ERC). Check your mortgage terms before making large overpayments. If you have other high-interest debts (like credit cards), it usually makes sense to clear those first.
+      </p>
+      <p>
+        Some borrowers prefer an <strong>offset mortgage</strong>, where your savings reduce the balance you pay interest on while keeping your cash accessible. Others choose <strong>interest-only mortgages</strong> (common for buy-to-let), where you only pay the interest each month and repay the capital at the end of the term.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="container">
+      <p>
+        <strong>PennyWise</strong> — Free UK financial calculators. Not financial advice.
+        <a href="/pennywise/">All Tools</a>
+      </p>
+      <p class="text-muted" style="margin-top:0.3rem;">© 2026 PennyWise. Built for UK borrowers.</p>
+    </div>
+  </footer>
+
+  <!-- ── Calculator Logic (inlined from calculator.js) ── -->
+  <script>
+    /**
+     * PennyWise — UK Mortgage Repayment Calculator
+     * Standard amortisation with overpayment analysis.
+     * All values in GBP.
+     */
+    function calculateMortgage(opts) {
+      opts = opts || {};
+      var propertyPrice = opts.propertyPrice != null ? opts.propertyPrice : 300000;
+      var deposit = opts.deposit != null ? opts.deposit : 45000;
+      var interestRate = opts.interestRate != null ? opts.interestRate : 4.5;
+      var termYears = opts.termYears != null ? opts.termYears : 25;
+      var overpayment = opts.overpayment || 0;
+
+      var loanAmount = propertyPrice - deposit;
+      var monthlyRate = (interestRate / 100) / 12;
+      var totalMonths = termYears * 12;
+      var ltv = propertyPrice > 0 ? (loanAmount / propertyPrice) * 100 : 0;
+
+      // Standard monthly payment (without overpayment)
+      var monthlyPayment = 0;
+      if (monthlyRate > 0) {
+        monthlyPayment = loanAmount *
+          (monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) /
+          (Math.pow(1 + monthlyRate, totalMonths) - 1);
+      } else {
+        monthlyPayment = loanAmount / totalMonths;
+      }
+
+      // Without overpayment
+      var totalPayableStandard = monthlyPayment * totalMonths;
+      var totalInterestStandard = totalPayableStandard - loanAmount;
+
+      // With overpayment
+      var totalMonthly = monthlyPayment + overpayment;
+      var remaining = loanAmount;
+      var monthsWithOver = 0;
+      var interestWithOver = 0;
+      var maxMonths = totalMonths * 2; // safety cap
+
+      for (var m = 0; m < maxMonths && remaining > 0; m++) {
+        if (remaining <= 0) break;
+        var monthInterest = remaining * monthlyRate;
+        interestWithOver += monthInterest;
+        var principalPaid = totalMonthly - monthInterest;
+        remaining -= principalPaid;
+        monthsWithOver++;
+
+        if (remaining < 0) {
+          interestWithOver += remaining;
+          remaining = 0;
+          break;
+        }
+      }
+
+      var yearsWithOver = monthsWithOver / 12;
+      var timeSavedMonths = totalMonths - monthsWithOver;
+      var interestSaved = totalInterestStandard - interestWithOver;
+
+      return {
+        propertyPrice: propertyPrice,
+        deposit: deposit,
+        loanAmount: loanAmount,
+        ltv: Math.round(ltv * 10) / 10,
+        interestRate: interestRate,
+        termYears: termYears,
+        monthlyPayment: Math.round(monthlyPayment * 100) / 100,
+        totalPayable: Math.round(totalPayableStandard * 100) / 100,
+        totalInterest: Math.round(totalInterestStandard * 100) / 100,
+        overpayment: overpayment || 0,
+        totalMonthlyWithOver: Math.round(totalMonthly * 100) / 100,
+        monthsWithOverpayment: monthsWithOver,
+        yearsWithOverpayment: Math.round(yearsWithOver * 10) / 10,
+        timeSavedMonths: timeSavedMonths,
+        timeSavedYears: Math.round((timeSavedMonths / 12) * 10) / 10,
+        interestSaved: Math.round(Math.max(0, interestSaved) * 100) / 100,
+        totalPayableWithOver: Math.round(totalMonthly * monthsWithOver * 100) / 100
+      };
+    }
+
+    /* ── DOM Interactivity ── */
+    function $(id) { return document.getElementById(id); }
+
+    function formatGBP(n) {
+      return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function formatMonths(months) {
+      if (months <= 0) return '—';
+      var years = Math.floor(months / 12);
+      var rem = Math.round(months % 12);
+      var parts = [];
+      if (years > 0) parts.push(years + ' year' + (years !== 1 ? 's' : ''));
+      if (rem > 0) parts.push(rem + ' month' + (rem !== 1 ? 's' : ''));
+      return parts.join(', ');
+    }
+
+    function getPaidOffDate(yearsFromNow) {
+      var d = new Date();
+      d.setFullYear(d.getFullYear() + Math.floor(yearsFromNow));
+      var m = d.getMonth();
+      var monthsRemainder = (yearsFromNow - Math.floor(yearsFromNow)) * 12;
+      d.setMonth(m + Math.round(monthsRemainder));
+      var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return monthNames[d.getMonth()] + ' ' + d.getFullYear();
+    }
+
+    function updateResults() {
+      var propertyPrice = parseFloat($('propertyPrice').value) || 0;
+      var deposit = parseFloat($('deposit').value) || 0;
+      var interestRate = parseFloat($('interestRate').value) || 0;
+      var termYears = parseInt($('termYears').value, 10) || 0;
+      var overpayment = parseFloat($('overpayment').value) || 0;
+
+      if (propertyPrice <= 0 || termYears <= 0) {
+        $('results').classList.remove('active');
+        return;
+      }
+
+      // Clamp deposit to property price
+      if (deposit > propertyPrice) deposit = propertyPrice;
+      if (deposit < 0) deposit = 0;
+
+      var result = calculateMortgage({
+        propertyPrice: propertyPrice,
+        deposit: deposit,
+        interestRate: interestRate,
+        termYears: termYears,
+        overpayment: overpayment
+      });
+
+      // Show results
+      $('results').classList.add('active');
+
+      // Monthly payment
+      $('monthlyPayment').textContent = formatGBP(result.monthlyPayment);
+
+      // Summary items
+      $('totalInterest').textContent = formatGBP(result.totalInterest);
+      $('totalPayable').textContent = formatGBP(result.totalPayable);
+      $('loanAmount').textContent = formatGBP(result.loanAmount);
+
+      // LTV
+      $('ltv').textContent = result.ltv + '%';
+      var ltvItem = $('ltvItem');
+      if (result.ltv > 90) {
+        ltvItem.classList.add('ltv-warning');
+      } else {
+        ltvItem.classList.remove('ltv-warning');
+      }
+
+      // Overpayment results
+      var overRes = $('overpaymentResults');
+      if (overpayment > 0 && result.timeSavedMonths > 0) {
+        overRes.classList.add('active');
+        $('interestSaved').textContent = formatGBP(result.interestSaved);
+        $('timeSaved').textContent = formatMonths(result.timeSavedMonths);
+        $('newTerm').textContent = result.yearsWithOverpayment + ' years';
+        $('paidOffDate').textContent = getPaidOffDate(result.yearsWithOverpayment);
+      } else {
+        overRes.classList.remove('active');
+      }
+    }
+
+    // Calculate on page load
+    updateResults();
+
+    // Calculate on button click
+    $('calculateBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      updateResults();
+    });
+
+    // Calculate on input change (debounced)
+    var debounceTimer;
+    var inputs = document.querySelectorAll('input[type="number"]');
+    inputs.forEach(function(input) {
+      input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(updateResults, 300);
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UK VAT Calculator · PennyWise</title>
+  <meta name="description" content="Calculate UK VAT instantly — add or remove VAT at standard (20%), reduced (5%), or zero (0%) rates. Free PennyWise VAT calculator.">
+<link rel="canonical" href="https://hermeswillmakemoney.github.io/pennywise/vat-calculator/" />
+<meta property="og:title" content="UK VAT Calculator - PennyWise" />
+<meta property="og:description" content="Calculate UK VAT instantly. Add or remove VAT at standard 20%, reduced 5%, or zero 0% rates. Free PennyWise VAT calculator." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://hermeswillmakemoney.github.io/pennywise/vat-calculator/" />
+<meta property="og:locale" content="en_GB" />
+<meta name="twitter:card" content="summary" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "UK VAT Calculator",
+  "url": "https://hermeswillmakemoney.github.io/pennywise/vat-calculator/",
+  "description": "Calculate UK VAT instantly. Add or remove VAT at standard 20%, reduced 5%, or zero 0% rates. Free PennyWise VAT calculator.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "GBP"
+  }
+}
+</script>
+
+  <style>
+    /* ── Reset & Tokens ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:        #FFFBF2;
+      --cream-warm:   #FDF6E8;
+      --sand:         #F0E4CE;
+      --amber:        #D4940B;
+      --amber-dark:   #A6710A;
+      --ink:          #2C2416;
+      --ink-soft:     #5A4E3C;
+      --ink-muted:    #8B7E6B;
+      --white:        #FFFFFF;
+      --green:        #2E7D32;
+      --green-light:  #E8F5E9;
+      --red:          #C62828;
+      --red-light:    #FFEBEE;
+      --border:       #E0D5C1;
+      --border-light: #EDE4D3;
+      --shadow-sm:    0 1px 3px rgba(44, 36, 22, 0.06);
+      --shadow-md:    0 4px 16px rgba(44, 36, 22, 0.08);
+      --shadow-lg:    0 8px 32px rgba(44, 36, 22, 0.10);
+      --radius-sm:    8px;
+      --radius-md:    12px;
+      --radius-lg:    16px;
+      --font-serif:   'Georgia', 'Times New Roman', serif;
+      --font-sans:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono:    'SF Mono', 'Fira Code', 'Consolas', monospace;
+      --max-width:    720px;
+    }
+
+    html { font-size: 17px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.65;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Typography ── */
+    h1, h2, h3 { font-family: var(--font-serif); color: var(--ink); line-height: 1.25; }
+    h1 { font-size: 2.2rem; font-weight: 700; }
+    h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+    h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+    p { margin-bottom: 0.85rem; color: var(--ink-soft); }
+    a { color: var(--amber-dark); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; color: var(--amber); }
+
+    .text-muted { color: var(--ink-muted); font-size: 0.9rem; }
+    .text-sm { font-size: 0.85rem; }
+    .text-lg { font-size: 1.1rem; }
+
+    /* ── Layout ── */
+    .container {
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border-light);
+      padding: 0.85rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .nav-logo .coin {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--amber), #C78A0C);
+      color: var(--white);
+      border-radius: 50%;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+    .nav-link {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s;
+    }
+    .nav-link:hover { background: var(--cream-warm); text-decoration: none; color: var(--amber-dark); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 2.5rem 0 2rem;
+      text-align: center;
+      background: linear-gradient(180deg, var(--white) 0%, var(--cream) 100%);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .hero h1 { margin-bottom: 0.5rem; }
+    .hero .subtitle { color: var(--ink-soft); font-size: 1.05rem; max-width: 500px; margin: 0 auto; }
+
+    /* ── Sections ── */
+    section { padding: 2rem 0; }
+    section + section { border-top: 1px solid var(--border-light); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Form ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+    }
+    @media (min-width: 500px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-wrapper:focus-within {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px rgba(212, 148, 11, 0.12);
+    }
+    .input-prefix, .input-suffix {
+      padding: 0 0.65rem;
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      font-weight: 500;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .input-wrapper input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 0.7rem 0.5rem;
+      font-size: 1rem;
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background: transparent;
+      min-width: 0;
+    }
+    .input-wrapper input::placeholder { color: var(--ink-muted); opacity: 0.6; }
+
+    .optional-tag {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-left: 0.25rem;
+    }
+
+    /* ── Radio Buttons ── */
+    .radio-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .radio-pill {
+      flex: 1;
+      position: relative;
+    }
+    .radio-pill input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .radio-pill label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.7rem 0.5rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: 0;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .radio-pill input[type="radio"]:checked + label {
+      border-color: var(--amber);
+      background: linear-gradient(135deg, rgba(212,148,11,0.08), rgba(199,138,12,0.05));
+      color: var(--amber-dark);
+      box-shadow: 0 0 0 2px rgba(212, 148, 11, 0.15);
+    }
+    .radio-pill label:hover {
+      border-color: var(--amber);
+      background: var(--cream-warm);
+    }
+
+    /* ── Rate Selector ── */
+    .rate-selector {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .rate-chip {
+      position: relative;
+    }
+    .rate-chip input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .rate-chip label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 0.9rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: 0;
+      transition: all 0.2s;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .rate-chip input[type="radio"]:checked + label {
+      border-color: var(--amber);
+      background: linear-gradient(135deg, rgba(212,148,11,0.08), rgba(199,138,12,0.05));
+      color: var(--amber-dark);
+      box-shadow: 0 0 0 2px rgba(212, 148, 11, 0.15);
+    }
+    .rate-chip label:hover {
+      border-color: var(--amber);
+      background: var(--cream-warm);
+    }
+
+    .custom-rate-row {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .custom-rate-row.active { display: flex; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--amber), #C78A0C);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(212, 148, 11, 0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #C78A0C, var(--amber-dark));
+      box-shadow: 0 4px 14px rgba(212, 148, 11, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn-cta {
+      background: var(--green);
+      color: var(--white);
+      width: 100%;
+      font-size: 1.05rem;
+      padding: 0.9rem 1.75rem;
+      box-shadow: 0 2px 8px rgba(46, 125, 50, 0.25);
+    }
+    .btn-cta:hover {
+      background: #256B28;
+      box-shadow: 0 4px 14px rgba(46, 125, 50, 0.35);
+      transform: translateY(-1px);
+    }
+    .btn-block { width: 100%; }
+
+    /* ── Results ── */
+    .results { display: none; }
+    .results.active { display: block; }
+
+    .result-hero {
+      text-align: center;
+      padding: 1.5rem 0;
+      background: var(--cream-warm);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--sand);
+    }
+    .result-hero .label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      margin-bottom: 0.15rem;
+    }
+    .result-hero .value {
+      font-family: var(--font-serif);
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--amber-dark);
+      line-height: 1.1;
+    }
+    .result-hero .per-month {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      margin-top: 0.1rem;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .result-item {
+      background: var(--cream-warm);
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 1rem;
+      text-align: center;
+      border: 1px solid var(--border-light);
+    }
+    .result-item .r-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-muted);
+    }
+    .result-item .r-value {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 0.15rem;
+    }
+    .result-item.vat-highlight .r-value { color: var(--amber-dark); }
+
+    /* ── CTA Card ── */
+    .cta-card {
+      background: linear-gradient(135deg, #1B3A1B, #2E5A2E);
+      color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      text-align: center;
+    }
+    .cta-card h3 {
+      color: var(--white);
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+    .cta-card p { color: rgba(255,255,255,0.8); margin-bottom: 1rem; }
+    .cta-card .price { font-size: 1.1rem; font-weight: 700; color: #A5D6A7; }
+
+    /* ── Explainer ── */
+    .explainer p { font-size: 0.95rem; }
+    .explainer ul {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+    .explainer ul li {
+      position: relative;
+      padding-left: 1.4rem;
+      margin-bottom: 0.5rem;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+    }
+    .explainer ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--amber);
+      font-weight: 700;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: auto;
+      background: var(--white);
+      border-top: 1px solid var(--border-light);
+      padding: 1.5rem 0;
+      text-align: center;
+    }
+    .footer p { font-size: 0.85rem; color: var(--ink-muted); margin: 0; }
+    .footer a { font-weight: 500; }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+      background: var(--cream-warm);
+      border: 1px solid var(--sand);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      margin-top: 1rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      html { font-size: 15px; }
+      h1 { font-size: 1.7rem; }
+      .result-hero .value { font-size: 2.2rem; }
+      .result-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ── -->
+  <nav class="nav">
+    <div class="container">
+      <a href="/pennywise/" class="nav-logo" aria-label="PennyWise Home">
+        <span class="coin">P</span> PennyWise
+      </a>
+      <a href="/pennywise/" class="nav-link">All Tools</a>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <header class="hero">
+    <div class="container">
+      <h1>UK VAT Calculator</h1>
+      <p class="subtitle">Add or remove VAT at any rate — standard 20%, reduced 5%, zero-rated, or a custom percentage. Get net, VAT, and gross amounts instantly.</p>
+    </div>
+  </header>
+
+  <!-- ── Calculator Section ── -->
+  <section id="calculator">
+    <div class="container">
+      <div class="card">
+        <h2>Calculate VAT</h2>
+
+        <div class="form-grid">
+          <!-- Amount -->
+          <div class="form-group full">
+            <label for="amount">Amount</label>
+            <div class="input-wrapper">
+              <span class="input-prefix">£</span>
+              <input type="number" id="amount" placeholder="100" value="100" min="0" step="0.01">
+            </div>
+          </div>
+
+          <!-- Operation: Add VAT / Remove VAT -->
+          <div class="form-group full">
+            <label>Operation</label>
+            <div class="radio-group">
+              <div class="radio-pill">
+                <input type="radio" id="opAdd" name="operation" value="add" checked>
+                <label for="opAdd">➕ Add VAT</label>
+              </div>
+              <div class="radio-pill">
+                <input type="radio" id="opRemove" name="operation" value="remove">
+                <label for="opRemove">➖ Remove VAT</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- VAT Rate -->
+          <div class="form-group full">
+            <label>VAT Rate</label>
+            <div class="rate-selector">
+              <div class="rate-chip">
+                <input type="radio" id="rateStandard" name="vatRate" value="standard" checked>
+                <label for="rateStandard">Standard 20%</label>
+              </div>
+              <div class="rate-chip">
+                <input type="radio" id="rateReduced" name="vatRate" value="reduced">
+                <label for="rateReduced">Reduced 5%</label>
+              </div>
+              <div class="rate-chip">
+                <input type="radio" id="rateZero" name="vatRate" value="zero">
+                <label for="rateZero">Zero 0%</label>
+              </div>
+              <div class="rate-chip">
+                <input type="radio" id="rateCustom" name="vatRate" value="custom">
+                <label for="rateCustom">Custom %</label>
+              </div>
+            </div>
+
+            <!-- Custom rate input -->
+            <div class="custom-rate-row" id="customRateRow">
+              <div class="input-wrapper" style="flex:1;">
+                <input type="number" id="customRate" placeholder="12.5" value="12.5" min="0" max="100" step="0.1">
+                <span class="input-suffix">%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="calculateBtn" style="margin-top:1.25rem;">
+          Calculate VAT
+        </button>
+      </div>
+
+      <!-- ── Results ── -->
+      <div class="results" id="results">
+        <div class="result-hero">
+          <div class="label" id="resultLabel">Gross Amount (inc. VAT)</div>
+          <div class="value" id="resultValue">—</div>
+          <div class="per-month" id="resultDescription"></div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="r-label">Net Amount</div>
+            <div class="r-value" id="netAmount">—</div>
+          </div>
+          <div class="result-item vat-highlight">
+            <div class="r-label">VAT Amount</div>
+            <div class="r-value" id="vatAmount">—</div>
+          </div>
+          <div class="result-item">
+            <div class="r-label">Gross Amount</div>
+            <div class="r-value" id="grossAmount">—</div>
+          </div>
+        </div>
+
+        <p class="disclaimer">
+          ⚠️ <strong>Disclaimer:</strong> This calculator provides estimates for guidance only. VAT rates and rules may vary by product category. Always consult HMRC guidance or a qualified accountant for business-critical calculations.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Gumroad CTA Section ── -->
+  <section>
+    <div class="container">
+      <div class="cta-card">
+        <h3>Get the Tax Toolkit</h3>
+        <p>Everything you need to handle VAT, self-assessment, and business taxes — all in one comprehensive spreadsheet. Built for UK freelancers and small business owners.</p>
+        <p class="price">£9.99</p>
+        <a href="https://gumroad.com/l/tax-toolkit" target="_blank" rel="noopener" class="btn btn-cta">
+          Get the Tax Toolkit →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Explainer Section ── -->
+  <section class="explainer">
+    <div class="container">
+      <h2>How Does UK VAT Work?</h2>
+
+      <h3>What is VAT?</h3>
+      <p>
+        <strong>Value Added Tax (VAT)</strong> is a consumption tax added to most goods and services sold in the UK. It's charged at each stage of the supply chain where value is added — hence the name. Businesses registered for VAT collect it on behalf of HMRC and can reclaim the VAT they pay on business purchases.
+      </p>
+
+      <h3>UK VAT Rates</h3>
+      <ul>
+        <li><strong>Standard rate (20%)</strong> — Applies to most goods and services: electronics, clothing, professional services, furniture, cars, and general retail items.</li>
+        <li><strong>Reduced rate (5%)</strong> — Applies to specific categories: domestic fuel and power, children's car seats, mobility aids for the elderly, and energy-saving materials for residential properties.</li>
+        <li><strong>Zero rate (0%)</strong> — Applies to essential items: most food (not catering or hot takeaway), children's clothing, books and newspapers, public transport, and prescription medicines. Zero-rated goods are still VAT-taxable but at 0% — businesses can reclaim input VAT on related costs, unlike exempt supplies.</li>
+      </ul>
+
+      <h3>Adding vs Removing VAT</h3>
+      <p>
+        <strong>Adding VAT</strong> is straightforward: multiply the net price by (1 + rate). For example, £100 + 20% VAT = £120 gross. This is how businesses calculate the selling price from their net cost.
+      </p>
+      <p>
+        <strong>Removing VAT</strong> (also called "extracting VAT") works in reverse: divide the gross amount by (1 + rate). For a £120 gross price at 20%, the net is £120 ÷ 1.2 = £100, and the VAT portion is £20. This is how you work out the pre-VAT price from a VAT-inclusive total.
+      </p>
+
+      <h3>VAT Registration</h3>
+      <p>
+        UK businesses must register for VAT once their <strong>taxable turnover exceeds £90,000</strong> in any rolling 12-month period (threshold as of 2024/25). Once registered, you must charge VAT on taxable supplies, submit quarterly returns through Making Tax Digital (MTD), and keep digital records.
+      </p>
+      <p>
+        Voluntary registration is also possible below the threshold — it can be beneficial if you sell mainly to VAT-registered businesses (who can reclaim your VAT) and you want to reclaim VAT on your own purchases.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="container">
+      <p>
+        <strong>PennyWise</strong> — Free UK financial calculators. Not financial advice.
+        <a href="/pennywise/">All Tools</a>
+      </p>
+      <p class="text-muted" style="margin-top:0.3rem;">© 2026 PennyWise. Built for UK taxpayers.</p>
+    </div>
+  </footer>
+
+  <!-- ── Calculator Logic (inlined from calculator.js) ── -->
+  <script>
+    /**
+     * PennyWise — UK VAT Calculator
+     * Add or remove VAT at standard (20%), reduced (5%), or zero (0%) rates.
+     */
+    var VAT_RATES = {
+      standard: 0.20,
+      reduced: 0.05,
+      zero: 0.00,
+    };
+
+    function calculateVAT(opts) {
+      opts = opts || {};
+      var amount = opts.amount != null ? opts.amount : 100;
+      var vatRate = opts.vatRate || 'standard';   // standard | reduced | zero | custom
+      var customRate = opts.customRate != null ? opts.customRate : 20;  // used when vatRate = 'custom'
+      var operation = opts.operation || 'add';     // 'add' VAT to net, or 'remove' VAT from gross
+
+      var rate;
+      if (vatRate === 'custom') {
+        rate = customRate / 100;
+      } else {
+        rate = VAT_RATES[vatRate] !== undefined ? VAT_RATES[vatRate] : VAT_RATES.standard;
+      }
+
+      var netAmount, vatAmount, grossAmount;
+
+      if (operation === 'add') {
+        // Adding VAT to net amount
+        netAmount = amount;
+        vatAmount = netAmount * rate;
+        grossAmount = netAmount + vatAmount;
+      } else {
+        // Removing VAT from gross amount
+        grossAmount = amount;
+        netAmount = grossAmount / (1 + rate);
+        vatAmount = grossAmount - netAmount;
+      }
+
+      return {
+        operation: operation,
+        vatRate: vatRate === 'custom' ? customRate + '%' : ((rate * 100) + '%'),
+        rateDecimal: rate,
+        netAmount: Math.round(netAmount * 100) / 100,
+        vatAmount: Math.round(vatAmount * 100) / 100,
+        grossAmount: Math.round(grossAmount * 100) / 100,
+        inputAmount: amount,
+        description: operation === 'add'
+          ? '£' + amount.toFixed(2) + ' + ' + (rate * 100) + '% VAT = £' + grossAmount.toFixed(2)
+          : '£' + amount.toFixed(2) + ' − ' + (rate * 100) + '% VAT = £' + netAmount.toFixed(2),
+      };
+    }
+
+    /* ── DOM Interactivity ── */
+    function $(id) { return document.getElementById(id); }
+
+    function formatGBP(n) {
+      return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function updateResults() {
+      var amount = parseFloat($('amount').value) || 0;
+
+      // Get operation
+      var operation = document.querySelector('input[name="operation"]:checked');
+      var opValue = operation ? operation.value : 'add';
+
+      // Get VAT rate
+      var vatRateEl = document.querySelector('input[name="vatRate"]:checked');
+      var vatRateValue = vatRateEl ? vatRateEl.value : 'standard';
+      var customRate = parseFloat($('customRate').value) || 0;
+
+      // Show/hide custom rate input
+      var customRow = $('customRateRow');
+      if (vatRateValue === 'custom') {
+        customRow.classList.add('active');
+      } else {
+        customRow.classList.remove('active');
+      }
+
+      if (amount <= 0) {
+        $('results').classList.remove('active');
+        return;
+      }
+
+      var result = calculateVAT({
+        amount: amount,
+        vatRate: vatRateValue,
+        customRate: customRate,
+        operation: opValue
+      });
+
+      // Show results
+      $('results').classList.add('active');
+
+      // Update hero
+      if (opValue === 'add') {
+        $('resultLabel').textContent = 'Gross Amount (inc. VAT)';
+        $('resultValue').textContent = formatGBP(result.grossAmount);
+      } else {
+        $('resultLabel').textContent = 'Net Amount (ex. VAT)';
+        $('resultValue').textContent = formatGBP(result.netAmount);
+      }
+      $('resultDescription').textContent = result.description;
+
+      // Update breakdown
+      $('netAmount').textContent = formatGBP(result.netAmount);
+      $('vatAmount').textContent = formatGBP(result.vatAmount);
+      $('grossAmount').textContent = formatGBP(result.grossAmount);
+    }
+
+    // Calculate on page load
+    updateResults();
+
+    // Calculate on button click
+    $('calculateBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      updateResults();
+    });
+
+    // Calculate on input change (debounced)
+    var debounceTimer;
+    var inputs = document.querySelectorAll('input[type="number"]');
+    inputs.forEach(function(input) {
+      input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(updateResults, 300);
+      });
+    });
+
+    // Recalculate on radio change
+    var radios = document.querySelectorAll('input[type="radio"]');
+    radios.forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        updateResults();
+      });
+    });
+  </script>
+
+</body>
+</html>

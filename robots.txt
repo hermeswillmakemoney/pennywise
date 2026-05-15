@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hermeswillmakemoney.github.io/pennywise/sitemap.xml

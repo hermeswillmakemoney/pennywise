@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UK Salary Calculator 2025/26 · PennyWise</title>
+  <style>
+    /* ─── tokens ───────────────────────────────────────────────────────── */
+    :root {
+      --bg:      #FAF7F2;
+      --surface: #FFFFFF;
+      --fg:      #1C1A17;
+      --muted:   #8A817A;
+      --border:  #E6E0D8;
+      --accent:  #C0512F;
+
+      --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
+      --fg-soft:     color-mix(in oklch, var(--fg) 6%, transparent);
+
+      --font-display: Georgia, 'Times New Roman', serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-mono:    ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+
+      --fs-h1: clamp(44px, 6vw, 76px);
+      --fs-h2: clamp(32px, 4vw, 48px);
+      --fs-h3: 22px;
+      --fs-lead: 19px;
+      --fs-body: 16px;
+      --fs-meta: 13px;
+
+      --gap-xs: 8px;
+      --gap-sm: 12px;
+      --gap-md: 20px;
+      --gap-lg: 32px;
+      --gap-xl: 56px;
+      --gap-2xl: 96px;
+      --container: 1120px;
+      --gutter: 32px;
+
+      --radius: 10px;
+      --radius-lg: 16px;
+    }
+
+    /* ─── reset & base ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: var(--fs-body);
+      line-height: 1.55;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; }
+    p { text-wrap: pretty; }
+    h1, h2, h3, h4 { text-wrap: balance; }
+
+    /* ─── layout primitives ─────────────────────────────────────────── */
+    .container {
+      max-width: var(--container);
+      margin-inline: auto;
+      padding-inline: var(--gutter);
+    }
+    .section {
+      padding-block: clamp(48px, 8vw, var(--gap-2xl));
+    }
+    .section + .section { border-top: 1px solid var(--border); }
+    .stack { display: flex; flex-direction: column; }
+    .stack > * + * { margin-top: var(--gap-md); }
+    .row { display: flex; align-items: center; gap: var(--gap-md); }
+    .row-between { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-md); }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap-lg); }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap-lg); }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap-md); }
+    .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: var(--gap-xl); align-items: start; }
+    .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: var(--gap-xl); align-items: start; }
+    @media (max-width: 920px) {
+      .grid-2, .grid-3, .grid-4, .grid-2-1, .grid-1-2 { grid-template-columns: 1fr; }
+    }
+
+    /* ─── type ──────────────────────────────────────────────────────── */
+    .h1, h1 { font-family: var(--font-display); font-size: var(--fs-h1); line-height: 1.04; letter-spacing: -0.02em; margin: 0; }
+    .h2, h2 { font-family: var(--font-display); font-size: var(--fs-h2); line-height: 1.1; letter-spacing: -0.015em; margin: 0; }
+    .h3, h3 { font-size: var(--fs-h3); font-weight: 600; line-height: 1.3; letter-spacing: -0.005em; margin: 0; }
+    .lead   { font-size: var(--fs-lead); line-height: 1.55; color: var(--muted); max-width: 60ch; margin: 0; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 var(--gap-md);
+    }
+    .meta { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--muted); }
+    .num  { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+    /* ─── chrome: nav + footer ──────────────────────────────────────── */
+    .topnav {
+      position: sticky; top: 0; z-index: 10;
+      background: color-mix(in oklch, var(--bg) 92%, transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topnav-inner { display: flex; align-items: center; justify-content: space-between; padding-block: 14px; }
+    .topnav .logo { font-family: var(--font-display); font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+    .topnav nav { display: flex; gap: var(--gap-lg); }
+    .topnav nav a { font-size: 14px; color: var(--muted); }
+    .topnav nav a:hover { color: var(--fg); }
+    .pagefoot { padding-block: var(--gap-xl); color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); }
+    .pagefoot .row-between { flex-wrap: wrap; gap: var(--gap-md); }
+
+    /* ─── buttons ───────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 20px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+      transition: transform 0.05s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+    .btn-primary:hover { background: color-mix(in oklch, var(--accent) 88%, black); }
+    .btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
+    .btn-secondary:hover { border-color: var(--fg); }
+    .btn-ghost { background: transparent; color: var(--fg); border-color: transparent; padding-inline: 8px; }
+    .btn-ghost:hover { color: var(--accent); }
+    .btn-arrow::after { content: '→'; transition: transform 0.15s ease; }
+    .btn-arrow:hover::after { transform: translateX(2px); }
+
+    /* ─── card / surface ────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+    }
+
+    /* ─── stat (big number + label) ─────────────────────────────────── */
+    .stat .stat-num {
+      font-family: var(--font-display);
+      font-size: clamp(56px, 8vw, 96px);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .stat .stat-label { color: var(--muted); font-size: 14px; margin-top: 8px; max-width: 24ch; }
+
+    /* ─── form field ────────────────────────────────────────────────── */
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 13px; color: var(--muted); }
+    .input, .select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--fg);
+      font: inherit;
+      font-size: 15px;
+    }
+    .input:focus, .select:focus {
+      outline: 2px solid var(--accent-soft);
+      border-color: var(--accent);
+    }
+    .select {
+      cursor: pointer;
+    }
+
+    /* ─── table ─────────────────────────────────────────────────────── */
+    .ds-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .ds-table th, .ds-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+    .ds-table th { color: var(--muted); font-weight: 500; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+    .ds-table tbody tr:hover { background: var(--fg-soft); }
+    .ds-table .num-col { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+
+    /* ─── hero ──────────────────────────────────────────────────────── */
+    .hero          { padding-block: clamp(80px, 12vw, 160px); }
+    .hero-center   { text-align: center; max-width: 32ch; margin-inline: auto; }
+    .hero h1       { margin-bottom: var(--gap-md); }
+    .hero .lead    { margin-bottom: var(--gap-lg); }
+    .hero-cta      { display: inline-flex; gap: var(--gap-sm); flex-wrap: wrap; }
+    .hero-center .hero-cta { justify-content: center; }
+
+    /* ─── divider ───────────────────────────────────────────────────── */
+    .rule  { border: 0; border-top: 1px solid var(--border); margin: 0; }
+    .rule-strong { border: 0; border-top: 1px solid var(--fg); margin: 0; }
+
+    /* ─── quote ─────────────────────────────────────────────────────── */
+    .quote {
+      font-family: var(--font-display);
+      font-size: clamp(24px, 2.6vw, 32px);
+      line-height: 1.32;
+      letter-spacing: -0.01em;
+      max-width: 28ch;
+    }
+    .quote-mark   {
+      font-family: var(--font-display);
+      font-size: 140px; line-height: 0.7;
+      color: var(--accent); opacity: 0.18;
+      margin-bottom: -28px;
+    }
+    .quote-author { color: var(--muted); font-size: 14px; margin-top: var(--gap-md); }
+
+    /* ─── ph-img placeholder ────────────────────────────────────────── */
+    .ph-img {
+      background:
+        linear-gradient(135deg, var(--accent-soft), var(--fg-soft)),
+        var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      aspect-ratio: 16 / 10;
+      display: grid; place-items: center;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ─── page-specific ─────────────────────────────────────────────── */
+    .calc-card {
+      max-width: 560px;
+      margin-inline: auto;
+    }
+    .calc-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-md);
+    }
+    .field-row {
+      display: flex;
+      align-items: center;
+      gap: var(--gap-sm);
+    }
+    .field-row label {
+      font-size: 14px;
+      color: var(--fg);
+      cursor: pointer;
+      user-select: none;
+    }
+    .field-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .input-wrapper {
+      position: relative;
+    }
+    .input-prefix, .input-suffix {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 15px;
+      pointer-events: none;
+    }
+    .input-prefix { left: 14px; }
+    .input-suffix { right: 14px; }
+    .input-wrapper .input.has-prefix { padding-left: 28px; }
+    .input-wrapper .input.has-suffix { padding-right: 28px; }
+
+    .results-area {
+      display: none;
+      margin-top: var(--gap-lg);
+    }
+    .results-area.visible {
+      display: block;
+    }
+
+    .result-headline {
+      text-align: center;
+      padding: 24px 0 var(--gap-md);
+    }
+    .take-home-monthly {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 5vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      color: var(--fg);
+      margin: 0 0 4px;
+    }
+    .take-home-label {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .take-home-annual {
+      color: var(--muted);
+      font-size: 15px;
+      margin-top: var(--gap-xs);
+    }
+    .take-home-annual .num {
+      font-weight: 500;
+      color: var(--fg);
+    }
+
+    .breakdown-table {
+      margin-top: var(--gap-md);
+    }
+
+    .table-total-row td {
+      border-top: 1px solid var(--fg);
+      font-weight: 600;
+    }
+    .table-takehome-row td {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .explainer-prose {
+      max-width: 60ch;
+      margin-inline: auto;
+    }
+    .explainer-prose p {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .cta-strip-inner {
+      max-width: 520px;
+      margin-inline: auto;
+      text-align: center;
+    }
+
+    .disclaimer {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .footer-disclaimer {
+      max-width: 60ch;
+      margin-bottom: var(--gap-md);
+    }
+  </style>
+<meta name="description" content="Calculate your UK take-home pay after income tax, National Insurance, student loan and pension. Uses 2025/26 HMRC rates. Free PennyWise calculator." />
+<link rel="canonical" href="https://hermeswillmakemoney.github.io/pennywise/salary-calculator/" />
+<meta property="og:title" content="UK Salary Calculator 2025/26 · PennyWise" />
+<meta property="og:description" content="Calculate your UK take-home pay after income tax, National Insurance, student loan and pension. Uses 2025/26 HMRC rates. Free PennyWise calculator." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://hermeswillmakemoney.github.io/pennywise/salary-calculator/" />
+<meta property="og:locale" content="en_GB" />
+<meta name="twitter:card" content="summary" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "UK Salary Calculator 2025/26",
+  "url": "https://hermeswillmakemoney.github.io/pennywise/salary-calculator/",
+  "description": "Calculate your UK take-home pay after income tax, National Insurance, student loan and pension. Uses 2025/26 HMRC rates. Free PennyWise calculator.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "GBP"
+  }
+}
+</script>
+</head>
+<body>
+  <header class="topnav" data-od-id="topnav">
+    <div class="container topnav-inner">
+      <a href="/pennywise/" class="logo">PennyWise</a>
+      <nav>
+        <a href="/pennywise/">All Tools</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content">
+    <!-- 1. Hero -->
+    <section class="section hero" data-od-id="hero">
+      <div class="container hero-center">
+        <p class="eyebrow">Free Tool · 2025/26</p>
+        <h1>UK Salary Calculator 2025/26</h1>
+        <p class="lead">See your exact take-home pay after tax, National Insurance, student loans, and pension. Updated for April 2025 rates.</p>
+        <div class="hero-cta">
+          <a href="#calculator-form" class="btn btn-primary">Calculate your pay</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Calculator -->
+    <section class="section" data-od-id="calculator">
+      <div class="container">
+        <div class="card calc-card" id="calculator-form">
+          <form class="calc-form" onsubmit="return false;">
+            <div class="field">
+              <label for="salary">Annual gross salary</label>
+              <div class="input-wrapper">
+                <span class="input-prefix">£</span>
+                <input
+                  type="number"
+                  id="salary"
+                  class="input has-prefix"
+                  min="0"
+                  max="10000000"
+                  value="30000"
+                  step="100"
+                />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <input type="checkbox" id="scotland" />
+              <label for="scotland">I live in Scotland</label>
+            </div>
+
+            <div class="field">
+              <label for="student-loan">Student loan plan</label>
+              <select id="student-loan" class="select">
+                <option value="">None</option>
+                <option value="plan1">Plan 1</option>
+                <option value="plan2">Plan 2</option>
+                <option value="plan4">Plan 4</option>
+                <option value="plan5">Plan 5</option>
+                <option value="postgrad">Postgraduate Loan</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="pension">Pension contribution (salary sacrifice)</label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="pension"
+                  class="input has-suffix"
+                  min="0"
+                  max="100"
+                  value="0"
+                  step="0.5"
+                />
+                <span class="input-suffix">%</span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="calculate-btn" style="width: 100%; justify-content: center;">
+              Calculate take-home pay
+            </button>
+          </form>
+
+          <div class="results-area" id="results-area">
+            <hr class="rule" />
+            <div class="result-headline">
+              <p class="take-home-monthly num" id="monthly-take-home">—</p>
+              <p class="take-home-label">Monthly take-home pay</p>
+              <p class="take-home-annual">
+                <span class="num" id="annual-take-home">—</span> per year
+              </p>
+              <p class="take-home-annual" style="margin-top: 4px; font-size: 13px;">
+                Total deductions: <span class="num" id="total-deductions" style="color: var(--fg);">—</span>
+              </p>
+            </div>
+
+            <div class="breakdown-table">
+              <table class="ds-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th class="num-col">Yearly</th>
+                    <th class="num-col">Monthly</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Gross Salary</td>
+                    <td class="num-col" id="bd-gross-yearly">—</td>
+                    <td class="num-col" id="bd-gross-monthly">—</td>
+                  </tr>
+                  <tr>
+                    <td>Income Tax</td>
+                    <td class="num-col" id="bd-tax-yearly">—</td>
+                    <td class="num-col" id="bd-tax-monthly">—</td>
+                  </tr>
+                  <tr>
+                    <td>National Insurance</td>
+                    <td class="num-col" id="bd-ni-yearly">—</td>
+                    <td class="num-col" id="bd-ni-monthly">—</td>
+                  </tr>
+                  <tr>
+                    <td>Student Loan</td>
+                    <td class="num-col" id="bd-sl-yearly">—</td>
+                    <td class="num-col" id="bd-sl-monthly">—</td>
+                  </tr>
+                  <tr>
+                    <td>Pension</td>
+                    <td class="num-col" id="bd-pension-yearly">—</td>
+                    <td class="num-col" id="bd-pension-monthly">—</td>
+                  </tr>
+                  <tr class="table-total-row">
+                    <td>Total Deductions</td>
+                    <td class="num-col" id="bd-totald-yearly">—</td>
+                    <td class="num-col" id="bd-totald-monthly">—</td>
+                  </tr>
+                  <tr class="table-takehome-row">
+                    <td>Take-Home Pay</td>
+                    <td class="num-col" id="bd-takehome-yearly">—</td>
+                    <td class="num-col" id="bd-takehome-monthly">—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. How we calculate this -->
+    <section class="section" data-od-id="explainer">
+      <div class="container">
+        <div class="explainer-prose">
+          <h2 style="text-align: center; margin-bottom: var(--gap-lg);">How we calculate this</h2>
+          <p>
+            Our calculator uses the official HM Revenue &amp; Customs (HMRC) rates and thresholds for the 2025/26 tax year.
+            This includes the latest income tax bands for England, Wales, and Northern Ireland, the separate Scottish rate
+            bands set by the Scottish Government, and the current Class 1 National Insurance contribution rates. We also
+            apply the Personal Allowance taper for incomes above £100,000 — where your tax-free allowance reduces by £1 for
+            every £2 earned over the threshold, reaching zero at £125,140.
+          </p>
+          <p>
+            Student loan calculations follow the repayment thresholds set by the Student Loans Company for each plan type,
+            including Plan 5 for students starting from August 2023 and the separate Postgraduate Loan scheme. Pension
+            contributions are treated as salary sacrifice, meaning your taxable income is reduced by your contribution
+            percentage before income tax and National Insurance are calculated. While we aim for complete accuracy, this
+            tool is for guidance only and should not replace professional financial advice.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. CTA strip -->
+    <section class="section" data-od-id="cta-strip">
+      <div class="container cta-strip-inner">
+        <h2>Get the Full Tax Toolkit</h2>
+        <p class="lead" style="margin: 16px auto 32px;">
+          Bonus calculators, printable reports, and a self-assessment helper. One-off purchase, no subscription.
+        </p>
+        <a href="https://gumroad.com/l/tax-toolkit" class="btn btn-primary" target="_blank" rel="noopener">
+          Buy on Gumroad — £9.99
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pagefoot" data-od-id="footer">
+    <div class="container">
+      <p class="disclaimer footer-disclaimer">
+        Disclaimer: This calculator provides estimates based on published HMRC rates and thresholds for the 2025/26 tax year.
+        It does not account for every personal circumstance — including marriage allowance, blind person's allowance, or
+        other reliefs. Always consult a qualified accountant or tax adviser for personal tax planning.
+      </p>
+      <div class="row-between">
+        <span>&copy; 2026 UK Free Tools</span>
+        <span class="meta"><a href="https://hermeswillmakemoney.github.io/pennywise/" style="color: var(--muted);">UK Free Tools</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Calculator logic (inlined from calculator.js) -->
+  <script>
+    /**
+     * UK Salary Calculator — Core Logic
+     * 2025/26 Tax Year
+     * All values in GBP. Annual unless stated.
+     */
+
+    // === INCOME TAX (England, Wales, NI) ===
+    const TAX_BANDS_UK = [
+      { name: 'Personal Allowance', start: 0, end: 12570, rate: 0 },
+      { name: 'Basic Rate', start: 12571, end: 50270, rate: 0.20 },
+      { name: 'Higher Rate', start: 50271, end: 125140, rate: 0.40 },
+      { name: 'Additional Rate', start: 125141, end: Infinity, rate: 0.45 },
+    ];
+
+    // === INCOME TAX (Scotland) ===
+    const TAX_BANDS_SCOTLAND = [
+      { name: 'Personal Allowance', start: 0, end: 12570, rate: 0 },
+      { name: 'Starter Rate', start: 12571, end: 14878, rate: 0.19 },
+      { name: 'Basic Rate', start: 14879, end: 26561, rate: 0.20 },
+      { name: 'Intermediate Rate', start: 26562, end: 43662, rate: 0.21 },
+      { name: 'Higher Rate', start: 43663, end: 75000, rate: 0.42 },
+      { name: 'Advanced Rate', start: 75001, end: 125140, rate: 0.45 },
+      { name: 'Top Rate', start: 125141, end: Infinity, rate: 0.48 },
+    ];
+
+    // === NATIONAL INSURANCE (Class 1, Employee, 2025/26) ===
+    const NI_WEEKLY_LOWER = 242;   // Primary Threshold
+    const NI_WEEKLY_UPPER = 967;   // Upper Earnings Limit
+    const NI_RATE_MAIN = 0.08;     // Between PT and UEL
+    const NI_RATE_UPPER = 0.02;    // Above UEL
+
+    // Convert weekly to annual
+    const NI_ANNUAL_LOWER = NI_WEEKLY_LOWER * 52;   // £12,584
+    const NI_ANNUAL_UPPER = NI_WEEKLY_UPPER * 52;   // £50,284
+
+    // === STUDENT LOANS (2025/26) ===
+    const STUDENT_LOAN_PLANS = {
+      'plan1': { threshold: 26900, rate: 0.09, name: 'Plan 1' },
+      'plan2': { threshold: 29385, rate: 0.09, name: 'Plan 2' },
+      'plan4': { threshold: 33795, rate: 0.09, name: 'Plan 4' },
+      'plan5': { threshold: 25000, rate: 0.09, name: 'Plan 5' },
+      'postgrad': { threshold: 21000, rate: 0.06, name: 'Postgraduate Loan' },
+    };
+
+    // === PERSONAL ALLOWANCE TAPER ===
+    const PA_TAPER_START = 100000;
+    const PA_TAPER_END = 125140;
+
+    /**
+     * Calculate personal allowance with taper for incomes over £100,000.
+     * £1 of allowance lost for every £2 over £100,000.
+     */
+    function getPersonalAllowance(grossIncome) {
+      if (grossIncome <= PA_TAPER_START) return 12570;
+      const reduction = Math.floor((grossIncome - PA_TAPER_START) / 2);
+      return Math.max(0, 12570 - reduction);
+    }
+
+    /**
+     * Calculate income tax for a given gross salary and region.
+     */
+    function calcIncomeTax(grossIncome, region) {
+      region = region || 'uk';
+      const bands = region === 'scotland' ? TAX_BANDS_SCOTLAND : TAX_BANDS_UK;
+      const personalAllowance = getPersonalAllowance(grossIncome);
+      let tax = 0;
+      const breakdown = [];
+      let previousBandEnd = 0;
+
+      for (const band of bands) {
+        let bandStart, bandEnd;
+
+        if (band.name === 'Personal Allowance') {
+          bandStart = 0;
+          bandEnd = personalAllowance;
+        } else {
+          const isFirstTaxBand = (band.name === 'Basic Rate' || band.name === 'Starter Rate');
+          bandStart = isFirstTaxBand ? personalAllowance + 1 : band.start;
+          bandStart = Math.max(bandStart, previousBandEnd + 1);
+          bandEnd = band.end;
+        }
+
+        if (bandStart >= bandEnd) continue;
+        if (grossIncome <= bandStart) break;
+
+        const taxableInBand = Math.min(grossIncome, bandEnd) - bandStart + 1;
+        if (taxableInBand > 0) {
+          const bandTax = taxableInBand * band.rate;
+          tax += bandTax;
+          breakdown.push({
+            band: band.name,
+            rate: band.rate,
+            taxable: taxableInBand,
+            tax: Math.round(bandTax * 100) / 100,
+          });
+        }
+        previousBandEnd = bandEnd;
+      }
+
+      return { total: Math.round(tax * 100) / 100, breakdown };
+    }
+
+    /**
+     * Calculate National Insurance contributions.
+     */
+    function calcNI(grossIncome) {
+      if (grossIncome <= NI_ANNUAL_LOWER) return { total: 0, breakdown: [] };
+
+      const mainPortion = Math.min(grossIncome, NI_ANNUAL_UPPER) - NI_ANNUAL_LOWER;
+      const mainNI = mainPortion * NI_RATE_MAIN;
+
+      let upperNI = 0;
+      if (grossIncome > NI_ANNUAL_UPPER) {
+        upperNI = (grossIncome - NI_ANNUAL_UPPER) * NI_RATE_UPPER;
+      }
+
+      const total = Math.round((mainNI + upperNI) * 100) / 100;
+
+      return {
+        total,
+        breakdown: [
+          { band: '£' + NI_ANNUAL_LOWER.toLocaleString() + ' to £' + NI_ANNUAL_UPPER.toLocaleString(), rate: NI_RATE_MAIN, taxable: mainPortion, tax: Math.round(mainNI * 100) / 100 },
+        ].concat(upperNI > 0 ? [{ band: 'Above £' + NI_ANNUAL_UPPER.toLocaleString(), rate: NI_RATE_UPPER, taxable: grossIncome - NI_ANNUAL_UPPER, tax: Math.round(upperNI * 100) / 100 }] : []),
+      };
+    }
+
+    /**
+     * Calculate student loan repayment.
+     */
+    function calcStudentLoan(grossIncome, plans) {
+      if (!plans || !plans.length) return { total: 0, breakdown: [] };
+
+      const repayments = [];
+      let total = 0;
+
+      for (const planKey of plans) {
+        const plan = STUDENT_LOAN_PLANS[planKey];
+        if (!plan) continue;
+        if (grossIncome <= plan.threshold) continue;
+
+        const above = grossIncome - plan.threshold;
+        const repayment = Math.round(above * plan.rate * 100) / 100;
+        repayments.push({ plan: plan.name, threshold: plan.threshold, rate: plan.rate, above, repayment });
+        total += repayment;
+      }
+
+      return { total: Math.round(total * 100) / 100, breakdown: repayments };
+    }
+
+    /**
+     * Calculate pension contribution (salary sacrifice).
+     */
+    function calcPensionGross(grossIncome, pensionPercent) {
+      if (!pensionPercent || pensionPercent <= 0) return grossIncome;
+      const contribution = grossIncome * (pensionPercent / 100);
+      return grossIncome - contribution;
+    }
+
+    /**
+     * Main calculator function.
+     */
+    function calculate(opts) {
+      opts = opts || {};
+      const grossSalary = opts.grossSalary || 30000;
+      const region = opts.region || 'uk';
+      const studentLoanPlans = opts.studentLoanPlans || [];
+      const pensionPercent = opts.pensionPercent || 0;
+
+      const postPensionGross = calcPensionGross(grossSalary, pensionPercent);
+      const pensionAmount = grossSalary - postPensionGross;
+
+      const incomeTax = calcIncomeTax(postPensionGross, region);
+      const ni = calcNI(postPensionGross);
+      const studentLoan = calcStudentLoan(postPensionGross, studentLoanPlans);
+
+      const totalDeductions = incomeTax.total + ni.total + studentLoan.total + pensionAmount;
+      const takeHome = grossSalary - totalDeductions;
+
+      return {
+        grossSalary,
+        pensionAmount: Math.round(pensionAmount * 100) / 100,
+        taxableIncome: postPensionGross,
+        incomeTax,
+        nationalInsurance: ni,
+        studentLoan,
+        totalDeductions: Math.round(totalDeductions * 100) / 100,
+        takeHomeAnnual: Math.round(takeHome * 100) / 100,
+        takeHomeMonthly: Math.round((takeHome / 12) * 100) / 100,
+        takeHomeWeekly: Math.round((takeHome / 52) * 100) / 100,
+        region,
+        taxYear: '2025/26',
+      };
+    }
+  </script>
+
+  <!-- UI wiring -->
+  <script>
+    (function () {
+      var fmt = new Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: 'GBP',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      function fmtNum(val) {
+        return fmt.format(val);
+      }
+
+      function updateResults(result) {
+        document.getElementById('monthly-take-home').textContent = fmtNum(result.takeHomeMonthly);
+        document.getElementById('annual-take-home').textContent = fmtNum(result.takeHomeAnnual);
+        document.getElementById('total-deductions').textContent = fmtNum(result.totalDeductions);
+
+        // Breakdown table
+        document.getElementById('bd-gross-yearly').textContent = fmtNum(result.grossSalary);
+        document.getElementById('bd-gross-monthly').textContent = fmtNum(result.grossSalary / 12);
+
+        document.getElementById('bd-tax-yearly').textContent = fmtNum(result.incomeTax.total);
+        document.getElementById('bd-tax-monthly').textContent = fmtNum(result.incomeTax.total / 12);
+
+        document.getElementById('bd-ni-yearly').textContent = fmtNum(result.nationalInsurance.total);
+        document.getElementById('bd-ni-monthly').textContent = fmtNum(result.nationalInsurance.total / 12);
+
+        document.getElementById('bd-sl-yearly').textContent = fmtNum(result.studentLoan.total);
+        document.getElementById('bd-sl-monthly').textContent = fmtNum(result.studentLoan.total / 12);
+
+        document.getElementById('bd-pension-yearly').textContent = fmtNum(result.pensionAmount);
+        document.getElementById('bd-pension-monthly').textContent = fmtNum(result.pensionAmount / 12);
+
+        document.getElementById('bd-totald-yearly').textContent = fmtNum(result.totalDeductions);
+        document.getElementById('bd-totald-monthly').textContent = fmtNum(result.totalDeductions / 12);
+
+        document.getElementById('bd-takehome-yearly').textContent = fmtNum(result.takeHomeAnnual);
+        document.getElementById('bd-takehome-monthly').textContent = fmtNum(result.takeHomeMonthly);
+
+        document.getElementById('results-area').classList.add('visible');
+      }
+
+      function doCalculate() {
+        var salary = parseFloat(document.getElementById('salary').value) || 0;
+        var scotland = document.getElementById('scotland').checked;
+        var studentLoanValue = document.getElementById('student-loan').value;
+        var pension = parseFloat(document.getElementById('pension').value) || 0;
+
+        var studentLoanPlans = studentLoanValue ? [studentLoanValue] : [];
+
+        var result = calculate({
+          grossSalary: salary,
+          region: scotland ? 'scotland' : 'uk',
+          studentLoanPlans: studentLoanPlans,
+          pensionPercent: pension,
+        });
+
+        updateResults(result);
+      }
+
+      document.getElementById('calculate-btn').addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        doCalculate();
+      });
+
+      // Also recalculate on input changes for instant feedback
+      ['salary', 'scotland', 'student-loan', 'pension'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', doCalculate);
+          el.addEventListener('change', doCalculate);
+        }
+      });
+
+      // Calculate on page load so the results are populated immediately
+      doCalculate();
+    })();
+  </script>
+</body>
+</html>
